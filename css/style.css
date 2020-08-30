@@ -27,8 +27,8 @@ th {
 
 .total {
 	height: 55px;
-	font-weight: bold;
 	font-size: 20px;
+	font-weight: bold;
 	color: #fff;
 	background-color: #000;
 }
@@ -71,4 +71,37 @@ th {
 
 .progress {
 	font-size: 25px;
+}
+
+.leftChance {
+	display: flex;
+	flex-direction: row-reverse;
+}
+
+.keepDiceContainer {
+	display: flex;
+}
+
+.rollDiceContainer {
+	display: flex;
+}
+
+.leftChanceText {
+	display: flex;
+	font-size: 30px;
+	font-weight: bold;
+	color: #96C7ED;
+}
+
+.diceImage {
+	width: 60px;
+}
+
+.diceContainer {
+	display: flex;
+	margin-left: 30px;
+	width: 350px;
+	height: 350px;
+	flex-direction: column;
+	justify-content: space-between;
 }
