@@ -77,12 +77,11 @@ body {
 	display: flex;
 	flex-direction: column;
 	justify-content: space-between;
-	
 	width: 75%;
-	height: 453px;
 	background-image: url('../image/board.png');
 	background-size: cover;
     background-repeat: no-repeat;
+	background-position-x: center;
 }
 
 .board .leftChance {
