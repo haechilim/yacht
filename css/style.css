@@ -1,0 +1,74 @@
+table {
+	display: flex;
+    border-collapse: collapse;
+	margin-left: 10px;
+	margin-top: 40px;
+}
+
+td {
+	border: 1px solid #444444;
+	height: 35px;
+	width: 43px;
+	font-weight: bold;
+	text-align: center;
+}
+
+tr {
+	border: 1px solid #444444;
+}
+
+th {
+	border: 1px solid #444444;
+}
+
+.categories {
+	width: 120px;
+}
+
+.total {
+	height: 55px;
+	font-weight: bold;
+	font-size: 20px;
+	color: #fff;
+	background-color: #000;
+}
+
+.subtotal {
+	background-color: #000;
+	color: #fff;
+}
+
+.PlayerSubtotal {
+	background-color: #828282;
+	color: #fff;
+}
+
+.player {
+	width: 40px;
+	font-size: 20px;
+}
+
+.bonus {
+	font-size: 19px;
+	border-top: 3px dotted #fff;
+}
+
+.table {
+	display: flex;
+	flex-direction: row;
+	justify-content: flex-start;
+	align-items: flex-end;
+}
+
+.textTurn {
+	font-size: 20px;
+	font-weight: normal;
+}
+
+.textSubtotal {
+	padding-bottom: 5px;
+}
+
+.progress {
+	font-size: 25px;
+}
