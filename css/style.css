@@ -1,107 +1,114 @@
-table {
-	display: flex;
-    border-collapse: collapse;
-	margin-left: 10px;
-	margin-top: 40px;
+body {
+	margin: 0px;
 }
 
-td {
+.container {
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+}
+
+.score-container {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+}
+
+.score {
+	display: flex;
+    border-collapse: collapse;
+}
+
+.score td {
 	border: 1px solid #444444;
-	height: 35px;
-	width: 43px;
 	font-weight: bold;
 	text-align: center;
 }
 
-tr {
+.score tr {
 	border: 1px solid #444444;
 }
 
-th {
+.score th {
 	border: 1px solid #444444;
 }
 
-.categories {
-	width: 120px;
+.score .subtotal {
+	background-color: #000;
+	color: #fff;
 }
 
-.total {
-	height: 55px;
+.score .total {
 	font-size: 20px;
 	font-weight: bold;
 	color: #fff;
 	background-color: #000;
 }
 
-.subtotal {
-	background-color: #000;
-	color: #fff;
-}
-
-.PlayerSubtotal {
+.score .playerSubtotal {
 	background-color: #828282;
 	color: #fff;
 }
 
-.player {
+.score .player {
 	width: 40px;
 	font-size: 20px;
 }
 
-.bonus {
+.score .bonus {
 	font-size: 19px;
 	border-top: 3px dotted #fff;
 }
 
-.table {
-	display: flex;
-	flex-direction: row;
-	justify-content: flex-start;
-	align-items: flex-end;
-}
-
-.textTurn {
+.score .textTurn {
 	font-size: 20px;
 	font-weight: normal;
 }
 
-.textSubtotal {
+.score .textSubtotal {
 	padding-bottom: 5px;
 }
 
-.progress {
+.score .progress {
 	font-size: 25px;
 }
 
-.leftChance {
+.board {
 	display: flex;
-	flex-direction: row-reverse;
+	flex-direction: column;
+	justify-content: space-between;
+	
+	width: 75%;
+	height: 453px;
+	background-image: url('../image/board.png');
+	background-size: cover;
+    background-repeat: no-repeat;
 }
 
-.keepDiceContainer {
+.board .leftChance {
 	display: flex;
-}
-
-.rollDiceContainer {
-	display: flex;
-}
-
-.leftChanceText {
-	display: flex;
+	justify-content: space-between;
 	font-size: 30px;
 	font-weight: bold;
 	color: #96C7ED;
 }
 
-.diceImage {
-	width: 60px;
+.board .keepDiceContainer {
+	display: flex;
 }
 
-.diceContainer {
+.board .rollDiceContainer {
 	display: flex;
-	margin-left: 30px;
-	width: 350px;
-	height: 350px;
-	flex-direction: column;
-	justify-content: space-between;
+}
+
+.board .textReroll {
+	display: flex;
+}
+
+.board .textLeftChanceText {
+	display: flex;
+}
+
+.board .diceImage {
+	margin: 0px 5px;
 }
