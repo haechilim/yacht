@@ -8,4 +8,5 @@ window.addEventListener('resize', function() {
 
 function resize() {
 	document.querySelector("#board").style.height = window.innerHeight + "px";
+	document.querySelector("#score-container").style.lineHeight = window.innerHeight / 19.2 + "px";
 }
