@@ -82,6 +82,8 @@ body {
 	background-size: cover;
     background-repeat: no-repeat;
 	background-position-x: center;
+	position: relative;
+	overflow: hidden;
 }
 
 .board .leftChance {
@@ -108,6 +110,22 @@ body {
 	display: flex;
 }
 
-.board .diceImage {
-	margin: 0px 5px;
+.keepDiceContainer .diceImage1 {
+	position: absolute;
+}
+
+.keepDiceContainer .diceImage2 {
+	position: absolute;
+}
+
+.keepDiceContainer .diceImage3 {
+	position: absolute;
+}
+
+.keepDiceContainer .diceImage4 {
+	position: absolute;
+}
+
+.keepDiceContainer .diceImage5 {
+	position: absolute;
 }
