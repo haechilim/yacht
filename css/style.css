@@ -110,22 +110,22 @@ body {
 	display: flex;
 }
 
-.keepDiceContainer .diceImage1 {
+.diceImage1 {
 	position: absolute;
 }
 
-.keepDiceContainer .diceImage2 {
+.diceImage2 {
 	position: absolute;
 }
 
-.keepDiceContainer .diceImage3 {
+.diceImage3 {
 	position: absolute;
 }
 
-.keepDiceContainer .diceImage4 {
+.diceImage4 {
 	position: absolute;
 }
 
-.keepDiceContainer .diceImage5 {
+.diceImage5 {
 	position: absolute;
 }
