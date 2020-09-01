@@ -19,6 +19,8 @@ var RDICE_HEIGHT = 130;//157;
 var SDICE_WIDTH = 170;
 var SDICE_HEIGHT = 170;
 
+var SCORE_LINE_HEIGHT_RATIO = 21;//19.2;
+
 var SDICES_POPUP_DELAY = 1000;
 
 var center = {};
@@ -165,7 +167,7 @@ function resize() {
 	var board = document.querySelector("#board");
 	
 	board.style.height = window.innerHeight + "px";
-	document.querySelector("#score-container").style.lineHeight = window.innerHeight / 19.2 + "px";
+	document.querySelector("#score-container").style.lineHeight = window.innerHeight / SCORE_LINE_HEIGHT_RATIO + "px";
 	
 	for(var i = 0; i < TOTAL_DICES; i++) {
 		var index = i + 1;

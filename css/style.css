@@ -1,5 +1,7 @@
 body {
 	margin: 0px;
+	background-color: #fcfbef;
+	font-family: 'Montserrat', sans-serif;
 }
 
 .container {
@@ -12,72 +14,155 @@ body {
 	display: flex;
 	flex-direction: column;
 	justify-content: center;
+	width: 35%;
+	padding: 5px;
 }
 
 .score {
 	display: flex;
     border-collapse: collapse;
-}
-
-.score td {
-	border: 1px solid #444444;
-	font-weight: bold;
-	text-align: center;
-}
-
-.score tr {
-	border: 1px solid #444444;
+    padding: 5px;
+    border: 1px solid #bbb;
+    font-weight: 200;
 }
 
 .score th {
-	border: 1px solid #444444;
-}
-
-.score .subtotal {
-	background-color: #000;
-	color: #fff;
-}
-
-.score .total {
-	font-size: 20px;
-	font-weight: bold;
-	color: #fff;
-	background-color: #000;
-}
-
-.score .playerSubtotal {
-	background-color: #828282;
-	color: #fff;
-}
-
-.score .player {
-	width: 40px;
-	font-size: 20px;
-}
-
-.score .bonus {
-	font-size: 19px;
-	border-top: 3px dotted #fff;
-}
-
-.score .textTurn {
-	font-size: 20px;
 	font-weight: normal;
 }
 
-.score .textSubtotal {
-	padding-bottom: 5px;
+.score th.turn {
+	width: 300px;
+	padding: 0px;
 }
 
-.score .progress {
+.score th .turn {
+	font-size: 20px;
+	margin-top: 5px;
+}
+
+.score th .progress {
+	font-size: 30px;
+	margin-top: 5px;
+    margin-bottom: 12px;
+}
+
+.score th .categories {
+    margin-left: -1px;
+    margin-bottom: -1px;
+    padding-left: 10px;
+    padding-top: 2px;
+	color: #fff;
+	background-color: #494949;
+	font-size: 18px;
+	text-align: left;
+}
+
+.score th.player img {
+	width: 50px;
+	height: 50px;
+}
+
+.score td {
+	text-align: center;
+	padding: 0px 10px;
+	border: 1px solid #494949;
+}
+
+.score td.category {
+	text-align: left;
+}
+
+.score td.number {
+	color: #9a9a9a;
 	font-size: 25px;
+	font-weight: 300;
+}
+
+.score tr td.fixed {
+	color: #333;
+	font-weight: 600;
+}
+
+.score tr td.turn {
+	background-color: #fde570;
+}
+
+.score tr.subtotal td {
+	padding: 0px 2px;
+}
+
+.score tr.subtotal .category {
+	color: #fff;
+	background-color: #494949;	
+}
+
+.score tr.subtotal .subtotal {
+	font-size: 13px;
+	padding-bottom: 0px;
+}
+
+.score tr.subtotal .bonus {
+	font-size: 16px;
+	border-top: 2px dotted #fff;
+}
+
+.score tr.subtotal .number {
+	color: #fff;
+	background-color: #b1b1b1;
+	font-size: 18px;
+	font-weight: 300;
+}
+
+.score tr.total td.category {
+	color: #fff;
+	background-color: #494949;
+	font-size: 20px;
+}
+
+.score tr.total td.number {
+	color: #333;
+	font-size: 27px;
+	font-weight: 300;
+	padding: 5px 10px;
+}
+
+.score .left-border {
+	border-left: 1px solid #494949;
+}
+
+.score .right-border {
+	border-right: 1px solid #494949;
+}
+
+.score .top-border {
+	border-top: 1px solid #494949;
+}
+
+.score .bottom-border {
+	border-bottom: 1px solid #494949;
+}
+
+.score .left-tborder {
+	border-left: 3px solid #494949;
+}
+
+.score .right-tborder {
+	border-right: 3px solid #494949;
+}
+
+.score .top-tborder {
+	border-top: 3px solid #494949;
+}
+
+.score .bottom-tborder {
+	border-bottom: 3px solid #494949;
 }
 
 .board {
 	display: flex;
 	flex-direction: column;
 	justify-content: space-between;
-	width: 75%;
+	width: 65%;
 	background-image: url('../image/board.png');
 	background-size: cover;
     background-repeat: no-repeat;
@@ -89,9 +174,10 @@ body {
 .board .leftChance {
 	display: flex;
 	justify-content: space-between;
-	font-size: 30px;
-	font-weight: bold;
-	color: #96C7ED;
+	margin-top: 10px;
+	font-size: 22px;
+	font-weight: 500;
+	color: #fff;
 	height: 0px;
 }
 
@@ -119,4 +205,12 @@ body {
 .selectDiceContainer .dice {
 	display: none;
 	margin: 0px 10px;
+}
+
+.drop-shadow {
+	-webkit-filter: drop-shadow(5px 5px 12px rgba(0,0,0,.5));
+	-moz-filter: drop-shadow(5px 5px 12px rgba(0,0,0,.5));
+	-ms-filter: drop-shadow(5px 5px 12px rgba(0,0,0,.5));
+	-o-filter: drop-shadow(5px 5px 12px rgba(0,0,0,.5));
+	filter: drop-shadow(5px 5px 12px rgba(0,0,0,.5));
 }

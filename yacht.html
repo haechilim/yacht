@@ -4,7 +4,10 @@
 <head>
   <meta charset="UTF-8">
   <title>haechi Yacht</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100;200;300;400;500;600;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
+
   <script type="text/javascript" src="js/main.js"></script>
 </head>
 
@@ -12,127 +15,127 @@
 	<div class="container">
 		<div class="score-container" id="score-container">
 			<table class="score">
-				<th class="turn">
-					<div class="textTurn">Turn</div>
-					<div class="progress">8/12</div>
-				</th>
-				<th class="player">P1</th>
-				<th class="player">P2</th>
-				<th class="player">P3</th>
-				
 				<tr>
-					<td class="categories">Aces</td>
-					<td class="p1_aces"></td>
-					<td class="p2_aces"></td>
-					<td class="p3_aces"></td>
+					<th class="turn bottom-tborder">
+						<div class="turn">Turn</div>
+						<div class="progress">8/12</div>
+						<div class="categories">Categories</div>
+					</th>
+					<th class="player top-tborder bottom-border left-tborder">
+						<img src="image/avatar/avatar3.png"/>
+					</th>
+					<th class="player top-tborder bottom-border left-border">
+						<img src="image/avatar/avatar9.png"/>
+					</th>
+					<th class="player top-tborder bottom-border left-border right-tborder">
+						<img src="image/avatar/avatar10.png"/>
+					</th>
 				</tr>
 				
 				<tr>
-					<td class="categories">Deuces</td>
-					<td class="p1_deuces"></td>
-					<td class="p2_deuces"></td>
-					<td class="p3_deuces"></td>
+					<td class="category left-tborder">Aces</td>
+					<td class="number fixed">1</td>
+					<td class="number fixed turn">3</td>
+					<td class="number fixed right-tborder">2</td>
+				</tr>		
+				<tr>
+					<td class="category left-tborder">Deuces</td>
+					<td class="number"></td>
+					<td class="number fixed turn">30</td>
+					<td class="number right-tborder"></td>
+				</tr>
+				<tr>
+					<td class="category left-tborder">Threes</td>
+					<td class="number"></td>
+					<td class="number turn">9</td>
+					<td class="number fixed right-tborder">11</td>
+				</tr>
+				<tr>
+					<td class="category left-tborder">Fours</td>
+					<td class="number"></td>
+					<td class="number turn">12</td>
+					<td class="number right-tborder"></td>
+				</tr>
+				<tr>
+					<td class="category left-tborder">Fives</td>
+					<td class="number"></td>
+					<td class="number fixed turn">12</td>
+					<td class="number right-tborder"></td>
+				</tr>
+				<tr>
+					<td class="category left-tborder">Sixes</td>
+					<td class="number"></td>
+					<td class="number turn">18</td>
+					<td class="number fixed right-tborder">5</td>
 				</tr>
 				
-				<tr>
-					<td class="categories">Threes</td>
-					<td class="p1_threes"></td>
-					<td class="p2_threes"></td>
-					<td class="p3_threes"></td>
-				</tr>
-				
-				<tr>
-					<td class="categories">Fours</td>
-					<td class="p1_fours"></td>
-					<td class="p2_fours"></td>
-					<td class="p3_fours"></td>
-				</tr>
-				
-				<tr>
-					<td class="categories">Fives</td>
-					<td class="p1_fives"></td>
-					<td class="p2_fives"></td>
-					<td class="p3_fives"></td>
-				</tr>
-				
-				<tr>
-					<td class="categories">Sixes</td>
-					<td class="p1_sixes"></td>
-					<td class="p2_sixes"></td>
-					<td class="p3_sixes"></td>
-				</tr>
-				
-				<tr>
-					<td class="categories subtotal">
-						<div class="textSubtotal">Subtotal</div>
+				<tr class="subtotal">
+					<td class="category left-tborder">
+						<div class="subtotal">Subtotal</div>
 						<div class="bonus">+35 Bonus</div>
 					</td>
-					<td class="playerSubtotal">
-						<div class="textSubtotal">0/63</div>
+					<td class="number">
+						<div class="subtotal">0/63</div>
 						<div class="bonus">+0</div>
 					</td>
-					<td class="playerSubtotal">
-						<div class="textSubtotal">0/63</div>
+					<td class="number">
+						<div class="subtotal">0/63</div>
 						<div class="bonus">+0</div>
 					</td>
-					<td class="playerSubtotal">
-						<div class="textSubtotal">0/63</div>
-						<div class="bonus">+0</div>
+					<td class="number right-tborder">
+						<div class="subtotal">77/63</div>
+						<div class="bonus">+35</div>
 					</td>
 				</tr>
+
 				<tr>
-					<td class="categories">Choice</td>
-					<td class="p1_choice"></td>
-					<td class="p2_choice"></td>
-					<td class="p3_choice"></td>
+					<td class="category left-tborder">Choice</td>
+					<td class="number fixed">15</td>
+					<td class="number turn">12</td>
+					<td class="number fixed right-tborder">15</td>
+				</tr>
+				<tr>
+					<td class="category left-tborder">4 of a kind</td>
+					<td class="number"></td>
+					<td class="number turn">0</td>
+					<td class="number right-tborder"></td>
+				</tr>
+				<tr>
+					<td class="category left-tborder">Full House</td>
+					<td class="number"></td>
+					<td class="number turn">0</td>
+					<td class="number right-tborder"></td>
+				</tr>
+				<tr>
+					<td class="category left-tborder">S. Straight</td>
+					<td class="number fixed">15</td>
+					<td class="number turn">0</td>
+					<td class="number fixed right-tborder">55</td>
+				</tr>
+				<tr>
+					<td class="category left-tborder">L. Straight</td>
+					<td class="number"></td>
+					<td class="number turn">0</td>
+					<td class="number fixed right-tborder">50</td>
+				</tr>
+				<tr>
+					<td class="category left-tborder">Yacht</td>
+					<td class="number"></td>
+					<td class="number turn">0</td>
+					<td class="number right-tborder"></td>
 				</tr>
 				
-				<tr>
-					<td class="categories">4 of a kind</td>
-					<td class="p1_4_of_a_kind"></td>
-					<td class="p2_4_of_a_kind"></td>
-					<td class="p3_4_of_a_kind"></td>
-				</tr>
-				
-				<tr>
-					<td class="categories">Full House</td>
-					<td class="p1_fullHouse"></td>
-					<td class="p2_fullHouse"></td>
-					<td class="p3_fullHouse"></td>
-				</tr>
-				
-				<tr>
-					<td class="categories">S. Straight</td>
-					<td class="p1_S_straight"></td>
-					<td class="p2_S_straight"></td>
-					<td class="p3_S_straight"></td>
-				</tr>
-				
-				<tr>
-					<td class="categories">L. Straight</td>
-					<td class="p1_L_straight"></td>
-					<td class="p2_L_straight"></td>
-					<td class="p3_L_straight"></td>
-				</tr>
-				
-				<tr>
-					<td class="categories">Yacht</td>
-					<td class="p1_yacht"></td>
-					<td class="p2_yacht"></td>
-					<td class="p3_yacht"></td>
-				</tr>
-				
-				<tr>
-					<td class="total">Total</td>
-					<td class="p1_total"></td>
-					<td class="p2_total"></td>
-					<td class="p3_total"></td>
+				<tr class="total">
+					<td class="category bottom-tborder left-tborder">Total</td>
+					<td class="number bottom-tborder">31</td>
+					<td class="number bottom-tborder">45</td>
+					<td class="number bottom-tborder right-tborder">123</td>
 				</tr>
 			</table>
 		</div>
 		
 		<div class="board" id="board">
-			<div class="leftChance">
+			<div class="leftChance drop-shadow">
 				<div id="reroll" class="rerollButton">Reroll</div>
 				<div class="textLeftChanceText">3 left</div>
 			</div>
