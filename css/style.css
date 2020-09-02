@@ -112,47 +112,11 @@ body {
 	height: 50px;
 }
 
-.floorDice .diceImage1 {
+.floorDice .dice {
 	position: absolute;
 }
 
-.floorDice .diceImage2 {
-	position: absolute;
-}
-
-.floorDice .diceImage3 {
-	position: absolute;
-}
-
-.floorDice .diceImage4 {
-	position: absolute;
-}
-
-.floorDice .diceImage5 {
-	position: absolute;
-}
-
-.selectDiceContainer .diceImage1 {
-	display: none;
-	margin: 0px 10px;
-}
-
-.selectDiceContainer .diceImage2 {
-	display: none;
-	margin: 0px 10px;
-}
-
-.selectDiceContainer .diceImage3 {
-	display: none;
-	margin: 0px 10px;
-}
-
-.selectDiceContainer .diceImage4 {
-	display: none;
-	margin: 0px 10px;
-}
-
-.selectDiceContainer .diceImage5 {
+.selectDiceContainer .dice {
 	display: none;
 	margin: 0px 10px;
 }
