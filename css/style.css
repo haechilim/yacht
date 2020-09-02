@@ -92,42 +92,67 @@ body {
 	font-size: 30px;
 	font-weight: bold;
 	color: #96C7ED;
+	height: 0px;
 }
 
-.board .keepDiceContainer {
+.board .selectDiceContainer {
 	display: flex;
-}
-
-.board .rollDiceContainer {
-	display: flex;
+	justify-content: center;
 }
 
 .board .rerollButton {
 	display: flex;
 	margin-left: 20px;
+	height: 50px;
 }
 
 .board .textLeftChanceText {
 	display: flex;
 	margin-right: 20px;
+	height: 50px;
 }
 
-.diceImage1 {
+.floorDice .diceImage1 {
 	position: absolute;
 }
 
-.diceImage2 {
+.floorDice .diceImage2 {
 	position: absolute;
 }
 
-.diceImage3 {
+.floorDice .diceImage3 {
 	position: absolute;
 }
 
-.diceImage4 {
+.floorDice .diceImage4 {
 	position: absolute;
 }
 
-.diceImage5 {
+.floorDice .diceImage5 {
 	position: absolute;
+}
+
+.selectDiceContainer .diceImage1 {
+	display: none;
+	margin: 0px 10px;
+}
+
+.selectDiceContainer .diceImage2 {
+	display: none;
+	margin: 0px 10px;
+}
+
+.selectDiceContainer .diceImage3 {
+	display: none;
+	margin: 0px 10px;
+}
+
+.selectDiceContainer .diceImage4 {
+	display: none;
+	margin: 0px 10px;
+}
+
+.selectDiceContainer .diceImage5 {
+	display: none;
+	margin: 0px 10px;
 }

@@ -16,15 +16,22 @@ var DICE_LEFTS = [ -314, -186, -56, 72, 204 ];
 var RDICE_WIDTH = 130;//157;
 var RDICE_HEIGHT = 130;//157;
 
+var SELECT_DICE_WIDTH = 170;
+var SELECT_DICE_HEIGHT = 170;
+
 var center = {};
 var floorPosition = {};
 var dicePositions = [];
 var diceSize = {};
 var rdiceSize = {};
+var selectDiceSize = {};
 var randomDices = [];
 
 var keepDiceCount = 0;
 var rollDiceCount = TOTAL_DICES - keepDiceCount;
+var selectDiceCount = TOTAL_DICES - keepDiceCount;
+
+var leftChance = 3;
 
 document.addEventListener("DOMContentLoaded", function() {
 	init();
@@ -41,27 +48,50 @@ window.addEventListener('resize', function() {
 
 function bindEvents() {
 	document.querySelector(".rerollButton").addEventListener('click', function() {
-		reroll(rollDiceCount);
-		console.log(randomDices);
+		if (leftChance > 0) {
+			reroll(rollDiceCount);
+			useChance();
+			console.log(randomDices);
+		}
 	});
 	
-	document.querySelector(".rollDiceContainer .diceImage1").addEventListener('click', function() {
+	document.querySelector(".selectDiceContainer .diceImage1").addEventListener('click', function() {
 		keepDice(1);
 	});
 	
-	document.querySelector(".rollDiceContainer .diceImage2").addEventListener('click', function() {
+	document.querySelector(".selectDiceContainer .diceImage2").addEventListener('click', function() {
 		keepDice(2);
 	});
 	
-	document.querySelector(".rollDiceContainer .diceImage3").addEventListener('click', function() {
+	document.querySelector(".selectDiceContainer .diceImage3").addEventListener('click', function() {
 		keepDice(3);
 	});
 	
-	document.querySelector(".rollDiceContainer .diceImage4").addEventListener('click', function() {
+	document.querySelector(".selectDiceContainer .diceImage4").addEventListener('click', function() {
 		keepDice(4);
 	});
 	
-	document.querySelector(".rollDiceContainer .diceImage5").addEventListener('click', function() {
+	document.querySelector(".selectDiceContainer .diceImage5").addEventListener('click', function() {
+		keepDice(5);
+	});
+	
+	document.querySelector(".keepDiceContainer .diceImage1").addEventListener('click', function() {
+		keepDice(1);
+	});
+	
+	document.querySelector(".keepDiceContainer .diceImage2").addEventListener('click', function() {
+		keepDice(2);
+	});
+	
+	document.querySelector(".keepDiceContainer .diceImage3").addEventListener('click', function() {
+		keepDice(3);
+	});
+	
+	document.querySelector(".keepDiceContainer .diceImage4").addEventListener('click', function() {
+		keepDice(4);
+	});
+	
+	document.querySelector(".keepDiceContainer .diceImage5").addEventListener('click', function() {
 		keepDice(5);
 	});
 }
@@ -71,19 +101,22 @@ function keepDice(number) {
 	
 	if(randomDiceIndex < 0 || randomDiceIndex >= randomDices.length) return;
 	
-	showPdice(number, false);
+	showSelectDice(number, false);
 	showDice(keepDiceCount + 1, true);
 	
 	document.querySelector(".keepDiceContainer .diceImage" + (keepDiceCount + 1)).setAttribute( 'src', 'image/dice' + randomDices[randomDiceIndex] + '.png');
 	keepDiceCount++;
 	rollDiceCount--;
+	selectDiceCount--;
+}
+
+function selectRollDice(number) {
+	
 }
 
 function init() {
-	for(var i = 1; i <= TOTAL_DICES; i++) {
-		showDice(i, false);
-		showPdice(i, false);
-	}
+	showAllDices(false);
+	showAllPdices(false);
 }
 
 function determinePositions() {
@@ -98,6 +131,9 @@ function determinePositions() {
 	
 	rdiceSize.width = RDICE_WIDTH * ratio;
 	rdiceSize.height = RDICE_HEIGHT * ratio;
+	
+	selectDiceSize.width = SELECT_DICE_WIDTH * ratio;
+	selectDiceSize.height = SELECT_DICE_HEIGHT * ratio;
 	
 	for(var i = 0; i< TOTAL_DICES; i++) {
 		var position = {};
@@ -125,9 +161,13 @@ function resize() {
 	for(var i = 0; i < TOTAL_DICES; i++) {
 		var dice = document.querySelector(".keepDiceContainer .diceImage" + (i + 1));
 		var pdice = document.querySelector(".rollDiceContainer .diceImage" + (i + 1));	
+		var selectDice = document.querySelector(".selectDiceContainer .diceImage" + (i + 1));	
 		
 		pdice.style.width = rdiceSize.width + "px";
 		pdice.style.height = rdiceSize.height + "px";
+		
+		selectDice.style.width = selectDiceSize.width + "px";
+		selectDice.style.height = selectDiceSize.height + "px";
 		
 		dice.style.left = (center.x + dicePositions[i].left) + "px";
 		dice.style.top = (center.y + dicePositions[i].top) + "px";
@@ -141,15 +181,18 @@ function reroll(count) {
 	var positions = [];
 	
 	showAllPdices(false);
+	showAllSelectDices(false);
 
 	for(var i = 0; i < count; i++) {
 		showPdice(i + 1, true);
 		
 		var rollDice = document.querySelector(".rollDiceContainer .diceImage" + (i + 1));
+		var selectDice = document.querySelector(".selectDiceContainer .diceImage" + (i + 1));
 		
 		randomDices[i] = randomDice();
 		
 		rollDice.setAttribute( 'src', 'image/pdice' + randomDices[i] + '.png' );
+		selectDice.setAttribute( 'src', 'image/dice' + randomDices[i] + '.png' );
 		
 		for(var j = 0; j < MAX_RETRY_COUNT; j++) {
 			var position = randomPosition();
@@ -163,6 +206,20 @@ function reroll(count) {
 			}
 		}
 	}
+	
+	var repetitionCount = 0;
+	
+	var timer = setInterval(function() {
+		if(repetitionCount >= 1) clearInterval(timer);
+		
+		showAllPdices(false);
+		
+		for(var i = 1; i <= count; i++) {
+			showSelectDice(i, true);
+		}
+		
+		repetitionCount++;
+	}, 1000)
 
 	function randomPosition() {
 		var left = Math.floor(Math.random() * (floorPosition.width - rdiceSize.width)) + floorPosition.left;
@@ -193,16 +250,31 @@ function reroll(count) {
 	}
 }
 
+function useChance() {
+	leftChance--;
+	document.querySelector(".textLeftChanceText").innerHTML = leftChance + " left";
+}
+
 function showAllDices(visible) {
 	for(var i = 1; i <= TOTAL_DICES; i++) {
-		document.querySelector(".keepDiceContainer .diceImage" + i).style.display = visible ? "inline" : "none";
+		showDice(i, visible);
 	}
 }
 
 function showAllPdices(visible) {
 	for(var i = 1; i <= TOTAL_DICES; i++) {
-		document.querySelector(".rollDiceContainer .diceImage" + i).style.display = visible ? "inline" : "none";
+		showPdice(i, visible);
 	}
+}
+
+function showAllSelectDices(visible) {
+	for(var i = 1; i <= TOTAL_DICES; i++) {
+		showSelectDice(i, visible);
+	}
+}
+
+function showSelectDice(number, visible) {
+	document.querySelector(".selectDiceContainer .diceImage" + number).style.display = visible ? "inline" : "none";
 }
 
 function showDice(number, visible) {
