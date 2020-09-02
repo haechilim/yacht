@@ -21,19 +21,70 @@ var floorPosition = {};
 var dicePositions = [];
 var diceSize = {};
 var rdiceSize = {};
+var randomDices = [];
 
-
+var keepDiceCount = 0;
+var rollDiceCount = TOTAL_DICES - keepDiceCount;
 
 document.addEventListener("DOMContentLoaded", function() {
+	init();
 	determinePositions();
 	resize();
-	reroll(TOTAL_DICES);
+	
+	bindEvents();
 });
 
 window.addEventListener('resize', function() {
 	determinePositions();
 	resize();
 });
+
+function bindEvents() {
+	document.querySelector(".rerollButton").addEventListener('click', function() {
+		reroll(rollDiceCount);
+		console.log(randomDices);
+	});
+	
+	document.querySelector(".rollDiceContainer .diceImage1").addEventListener('click', function() {
+		keepDice(1);
+	});
+	
+	document.querySelector(".rollDiceContainer .diceImage2").addEventListener('click', function() {
+		keepDice(2);
+	});
+	
+	document.querySelector(".rollDiceContainer .diceImage3").addEventListener('click', function() {
+		keepDice(3);
+	});
+	
+	document.querySelector(".rollDiceContainer .diceImage4").addEventListener('click', function() {
+		keepDice(4);
+	});
+	
+	document.querySelector(".rollDiceContainer .diceImage5").addEventListener('click', function() {
+		keepDice(5);
+	});
+}
+
+function keepDice(number) {
+	var randomDiceIndex = number - 1;
+	
+	if(randomDiceIndex < 0 || randomDiceIndex >= randomDices.length) return;
+	
+	showPdice(number, false);
+	showDice(keepDiceCount + 1, true);
+	
+	document.querySelector(".keepDiceContainer .diceImage" + (keepDiceCount + 1)).setAttribute( 'src', 'image/dice' + randomDices[randomDiceIndex] + '.png');
+	keepDiceCount++;
+	rollDiceCount--;
+}
+
+function init() {
+	for(var i = 1; i <= TOTAL_DICES; i++) {
+		showDice(i, false);
+		showPdice(i, false);
+	}
+}
 
 function determinePositions() {
 	var board = document.querySelector("#board");
@@ -88,9 +139,17 @@ function resize() {
 function reroll(count) {
 	var MAX_RETRY_COUNT = 100;
 	var positions = [];
+	
+	showAllPdices(false);
 
 	for(var i = 0; i < count; i++) {
+		showPdice(i + 1, true);
+		
 		var rollDice = document.querySelector(".rollDiceContainer .diceImage" + (i + 1));
+		
+		randomDices[i] = randomDice();
+		
+		rollDice.setAttribute( 'src', 'image/pdice' + randomDices[i] + '.png' );
 		
 		for(var j = 0; j < MAX_RETRY_COUNT; j++) {
 			var position = randomPosition();
@@ -116,6 +175,10 @@ function reroll(count) {
 			bottom: top + rdiceSize.height
 		};
 	}
+	
+	function randomDice() {
+		return Math.floor(Math.random() * 6 + 1);
+	}
 
 	function isOverlapped(position) {		
 		for(var i = 0; i < positions.length; i++) {
@@ -128,4 +191,24 @@ function reroll(count) {
 		
 		return false;
 	}
+}
+
+function showAllDices(visible) {
+	for(var i = 1; i <= TOTAL_DICES; i++) {
+		document.querySelector(".keepDiceContainer .diceImage" + i).style.display = visible ? "inline" : "none";
+	}
+}
+
+function showAllPdices(visible) {
+	for(var i = 1; i <= TOTAL_DICES; i++) {
+		document.querySelector(".rollDiceContainer .diceImage" + i).style.display = visible ? "inline" : "none";
+	}
+}
+
+function showDice(number, visible) {
+	document.querySelector(".keepDiceContainer .diceImage" + number).style.display = visible ? "inline" : "none";
+}
+
+function showPdice(number, visible) {
+	document.querySelector(".rollDiceContainer .diceImage" + number).style.display = visible ? "inline" : "none";
 }
