@@ -32,12 +32,15 @@ var sDiceSize = {};
 
 var leftChance = 3;
 var rollDices = [0, 0, 0, 0, 0];
-var keepDices = [];
+var keepDices = [0, 0, 0, 0, 0];
+var resultDices = [0, 0, 0, 0, 0];
 
+var turn = 0;
 
 function init() {
 	showAllKeepDices(false);
 	showAllFloorDices(false);
+	nextTurn();
 }
 
 function reroll(oncomplete) {
@@ -57,7 +60,11 @@ function reroll(oncomplete) {
 		showFloorDice(index, true);
 	}
 	
+	updateResult();
+	resultDices.sort();
 	rollDices.sort();
+	
+	markGuideNumber();
 	
 	if(oncomplete) oncomplete();
 	
@@ -102,30 +109,104 @@ function reroll(oncomplete) {
 	}
 }
 
+// ---------------------------------------------
+
+function markGuideNumber() {
+	document.querySelector(".p" + turn + "_aces").innerHTML = getDiceDotCount(1);
+}
+
+function getDiceDotCount(number) {
+	var count = 0;
+	
+	for(var i = 0; i < resultDices.length; i++) {
+		if(resultDices[i] == number) count += number;
+	}
+	
+	return count;
+}
+
+// ---------------------------------------------
+
+function hideRerollButton() {
+	if(leftChance <= 0) {
+		showRerollButton(false);
+		return;
+	}
+	
+	for(var i = 0; i < rollDices.length; i++) {
+		if(rollDices[i] != 0) {
+			showRerollButton(true);
+			return;
+		}
+	}
+	
+	showRerollButton(false);
+}
+
 function keepDice(number, index) {
 	if(index < 0 || index >= rollDices.length) return;
 	
 	rollDices.splice(index, 1);
-	keepDices.push(number);
+	
+	keepDicePush(number);
 	
 	redrawFloatDices();
 	redrawKeepDices();
+	hideRerollButton();
 }
 
 function unkeepDice(number, index) {
 	if(index < 0 || index >= keepDices.length) return;
 	
-	keepDices.splice(index, 1);
+	keepDices[index] = 0;
 	rollDices.push(number);
 	rollDices.sort();
 	
 	redrawFloatDices();
 	redrawKeepDices();
+	hideRerollButton();
+}
+
+function nextTurn() {
+	rollDices = [0, 0, 0, 0, 0];
+	keepDices = [0, 0, 0, 0, 0];
+	
+	showRerollButton(true);
+	showAllFloatDices(false);
+	showAllKeepDices(false);
+	
+	markPlayerBoard(false);
+	increaseTurn();
+	updateChance(leftChance);
+	markPlayerBoard(true);
+}
+
+function markPlayerBoard(visible) {
+	var playerScoreBoard = document.querySelectorAll(".p" + turn);
+	
+	for(var i = 0; i < playerScoreBoard.length; i++) {
+		playerScoreBoard[i].style.backgroundColor = visible ? "#ffe269" : "#fff";
+	}
+}
+
+function increaseTurn() {
+	turn++;
+	turn = turn % 4 == 0 ? 1 : turn % 4;
+	leftChance = 3;
 }
 
 function decreaseChance() {
 	leftChance--;
 	updateChance(leftChance);
+}
+
+function keepDicePush(number) {
+	for(var i = 0; i < keepDices.length; i++) {
+		if(keepDices[i] == 0) {
+			keepDices[i] = number;
+			break;
+		}
+	}
 }
 
 // ---------------------------------------------
@@ -203,6 +284,8 @@ function redrawKeepDices() {
 	showAllKeepDices(false);
 	
 	for(var index = 0; index < keepDices.length; index++) {
+		if(keepDices[index] == 0) continue;
+		
 		updateKeepDice(index, keepDices[index]);
 		showKeepDice(index, true);
 	}
@@ -245,6 +328,24 @@ function updateKeepDice(index, number) {
 	dice.setAttribute('index', index);
 }
 
+function updateResult() {
+	var index = 0;
+	
+	for(var i = 0; i < rollDices.length; i++) {
+		if(rollDices[i] == 0) continue;
+		
+		resultDices[index] = rollDices[i];
+		index++;
+	}
+	
+	for(var i = 0; i < keepDices.length; i++) {
+		if(keepDices[i] == 0) continue;
+		
+		resultDices[index] = keepDices[i];
+		index++;
+	}
+}
+
 // ---------------------------------------------
 
 function showAllKeepDices(visible) {
@@ -277,6 +378,10 @@ function showFloatDice(index, visible) {
 	document.querySelector(".selectDiceContainer .dice:nth-child(" + (index + 1) + ")").style.display = visible ? "inline" : "none";
 }
 
+function showRerollButton(visible) {
+	document.querySelector("#reroll").style.display = visible ? "flex" : "none";
+}
+
 // ---------------------------------------------
 
 document.addEventListener("DOMContentLoaded", function() {
@@ -304,6 +409,7 @@ function bindEvents() {
 		});
 		
 		decreaseChance();
+		hideRerollButton();
 	});
 	
 	document.querySelectorAll(".selectDiceContainer .dice").forEach(function(element) {
@@ -319,6 +425,12 @@ function bindEvents() {
 			var number = parseInt(this.getAttribute("number"));
 			var index = parseInt(this.getAttribute("index"));
 			unkeepDice(number, index);
+		});
+	});	
+	
+	document.querySelectorAll(".categories").forEach(function(element) {
+		element.addEventListener('click', function() {
+			nextTurn();
 		});
 	});	
 }
