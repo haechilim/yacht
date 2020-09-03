@@ -1,5 +1,7 @@
 var TOTAL_DICES = 5;
 var CATEGORY_COUNT = 15;
+var SUB_TOTAL_INDEX = 8;
+var PLAYER_COUNT = 3;
 
 var BOARD_WIDTH = 1903;
 var BOARD_HEIGHT = 1077;
@@ -39,11 +41,13 @@ var rollDices = [0, 0, 0, 0, 0];
 var keepDices = [0, 0, 0, 0, 0];
 var resultDices = [0, 0, 0, 0, 0];
 
+var gameTurn = 1;
 var turn = 0;
 
 function init() {
 	showAllKeepDices(false);
 	showAllFloorDices(false);
+	initAllPlayerCategoryStatus();
 	nextTurn();
 }
 
@@ -63,6 +67,7 @@ function rollWithAnimation() {
 	});
 	
 	decreaseChance();
+	markSelectable(true);
 }
 
 function roll(oncomplete) {
@@ -87,7 +92,7 @@ function roll(oncomplete) {
 	resultDices.sort();
 	rollDices.sort();
 	
-	markGuideNumber();
+	showGuidNumber(true);
 	
 	if(oncomplete) oncomplete();
 	
@@ -132,129 +137,18 @@ function roll(oncomplete) {
 	}
 }
 
-// ---------------------------------------------
-
-function markGuideNumber() {
-	var playerCategory = turn + 1;
-	
-	for(var number = 2; number <= 7; number++) {
-		document.querySelector(".score tr:nth-child(" + number + ") td:nth-child(" + playerCategory + ")").innerHTML = getDiceDotCount(number - 1);
-	}
-	
-	document.querySelector(".score tr:nth-child(9) td:nth-child(" + playerCategory + ")").innerHTML = getChoiceScore();
-	document.querySelector(".score tr:nth-child(10) td:nth-child(" + playerCategory + ")").innerHTML = get_4_of_kind_score();
-	document.querySelector(".score tr:nth-child(11) td:nth-child(" + playerCategory + ")").innerHTML = getFullHouseScore();
-	document.querySelector(".score tr:nth-child(12) td:nth-child(" + playerCategory + ")").innerHTML = get_S_srtaight_score();
-	document.querySelector(".score tr:nth-child(13) td:nth-child(" + playerCategory + ")").innerHTML = get_L_srtaight_score();
-	document.querySelector(".score tr:nth-child(14) td:nth-child(" + playerCategory + ")").innerHTML = getYachtScore();
-}
-
-function removeGuideNumber() {
+function initAllPlayerCategoryStatus() {
 	for(var i = 2; i < CATEGORY_COUNT; i++) {
-		if(i == 8) continue;
+		if(i == SUB_TOTAL_INDEX) continue;
 		
-		var playerCategory = document.querySelector(".score tr:nth-child(" + i + ") td:nth-child(" + (turn + 1) + ")");
-		
-		if(playerCategory.contains('fixed')) continue;
-		
-		playerCategory.innerHTML = "";
-	}
-}
-
-function getDiceDotCount(number) {
-	var count = 0;
-	
-	for(var i = 0; i < resultDices.length; i++) {
-		if(resultDices[i] == number) count += number;
-	}
-	
-	return count;
-}
-
-function getChoiceScore() {
-	var sum = 0;
-	
-	for(var i = 0; i < resultDices.length; i++) {
-		sum += resultDices[i];
-	}
-	
-	return sum;
-}
-
-function get_4_of_kind_score() {
-	var count = 1;
-	var number = 0;
-	var is_4_of_kind = false;
-	
-	for(var i = 0; i < resultDices.length; i++) {
-		if(resultDices[i] == number) {
-			count++;
-			if(count >= 4) is_4_of_kind = true;
-		}
-		else {
-			number = resultDices[i]; 
-			count = 1;
-		}
-	}
-	
-	return is_4_of_kind ? getChoiceScore() : 0;
-}
-
-function getFullHouseScore() {
-	var number = 0;
-	var count = 1;
-	var temp = 0;
-	var isDouble = false;
-	var isTriple = false;
-	
-	for(var i = 0; i < resultDices.length; i++) {
-		if(resultDices[i] == number) {
-			count++;
+		for(var playerIndex = 2; playerIndex <= PLAYER_COUNT + 1; playerIndex++) {
+			var playerCategory = document.querySelector(".score tr:nth-child(" + i + ") td:nth-child(" + playerIndex + ")");
 			
-			if(count == 3) {
-				if(number == temp) isDouble = false;
-				
-				isTriple = true;
-			}
-			else if(count == 2 &&  !isDouble) {
-				temp = number;
-				isDouble = true;
-			}
-		}
-		else {
-			number = resultDices[i];
-			count = 1;
+			playerCategory.classList.remove('selectable');
+			playerCategory.classList.remove('fixed');
+			playerCategory.innerHTML = "";
 		}
 	}
-	
-	return isDouble && isTriple ? getChoiceScore() : 0;
-}
-
-function get_S_srtaight_score() {
-	var count = 1;
-	
-	for(var i = 0; i <= resultDices.length; i++) {
-		if(resultDices[i] + 1 == resultDices[i + 1]) count++;
-		else count = 1;
-	}
-	
-	return count >= 4 ? 15 : 0;
-}
-
-function get_L_srtaight_score() {
-	for(var i = 0; i <= resultDices.length; i++) {
-		if(resultDices[i] + 1 != resultDices[i + 1]) return 0;
-	}
-	
-	return 30;
-}
-
-function getYachtScore() {
-	for(var i = 0; i <= resultDices.length; i++) {
-		if(resultDices[i] != resultDices[i + 1]) return 0;
-	}
-	
-	return 50;
 }
 
 // ---------------------------------------------
@@ -303,13 +197,14 @@ function nextTurn() {
 	rollDices = [0, 0, 0, 0, 0];
 	keepDices = [0, 0, 0, 0, 0];
 	
+	markSelectable(false);
+	
 	increaseTurn();
 	
 	showRollButton(true);
 	showAllFloatDices(false);
 	showAllKeepDices(false);
 	
-	markPlayerBoard(false);
 	updateChance(leftChance);
 	markAllPlayerBoard(false);
 	markPlayerBoard(true);
@@ -325,15 +220,43 @@ function markAllPlayerBoard(visible) {
 	for(var i = 2; i <= CATEGORY_COUNT; i++) {
 		var playerBorad = document.querySelector(".score tr:nth-child(" + i + ")");
 		
-		for(var j = 2; j <= 4; j++) {
+		for(var j = 2; j <= PLAYER_COUNT + 1; j++) {
 			if(visible) playerBorad.querySelector("td:nth-child(" + j + ")").classList.add('turn');
 			else playerBorad.querySelector("td:nth-child(" + j + ")").classList.remove('turn');
 		}
 	}
 }
 
+function markSelectable(visible) {
+	for(var i = 2; i < CATEGORY_COUNT; i++) {
+		if(i == SUB_TOTAL_INDEX) continue;
+		
+		var playerCategory = document.querySelector(".score tr:nth-child(" + i + ") td:nth-child(" + (turn + 1) + ")");
+		
+		if(!visible) playerCategory.classList.remove('selectable');
+		else {
+			if(leftChance == 3 || playerCategory.classList.contains('fixed')) continue;
+			playerCategory.classList.add('selectable');
+		}
+	}
+}
+
+//-------------------------------------------------
+
 function increaseTurn() {
 	turn++;
+	
+	if(turn >= 4) {
+		gameTurn++;
+		
+		if(gameTurn >= 13) {
+			showRollButton(false);
+			return;
+		}
+		
+		document.querySelector(".progress").innerHTML = gameTurn + "/12"
+	}
+	
 	turn = turn % 4 == 0 ? 1 : turn % 4;
 	leftChance = 3;
 }
@@ -551,6 +474,140 @@ function showCup(visible) {
 	document.querySelector("#cup").style.display = visible ? "flex" : "none";
 }
 
+function showGuidNumber(visible) {
+	visible ? markGuideNumber() : removeGuideNumber();
+}
+
+// ---------------------------------------------
+
+function markGuideNumber() {
+	var playerCategory = turn + 1;
+	
+	document.querySelector(".score tr:nth-child(2) td:nth-child(" + playerCategory + ")").innerHTML = getDiceDotCount(1);
+	document.querySelector(".score tr:nth-child(3) td:nth-child(" + playerCategory + ")").innerHTML = getDiceDotCount(2);
+	document.querySelector(".score tr:nth-child(4) td:nth-child(" + playerCategory + ")").innerHTML = getDiceDotCount(3);
+	document.querySelector(".score tr:nth-child(5) td:nth-child(" + playerCategory + ")").innerHTML = getDiceDotCount(4);
+	document.querySelector(".score tr:nth-child(6) td:nth-child(" + playerCategory + ")").innerHTML = getDiceDotCount(5);
+	document.querySelector(".score tr:nth-child(7) td:nth-child(" + playerCategory + ")").innerHTML = getDiceDotCount(6);
+	document.querySelector(".score tr:nth-child(9) td:nth-child(" + playerCategory + ")").innerHTML = getChoiceScore();
+	document.querySelector(".score tr:nth-child(10) td:nth-child(" + playerCategory + ")").innerHTML = get_4_of_kind_score();
+	document.querySelector(".score tr:nth-child(11) td:nth-child(" + playerCategory + ")").innerHTML = getFullHouseScore();
+	document.querySelector(".score tr:nth-child(12) td:nth-child(" + playerCategory + ")").innerHTML = get_S_srtaight_score();
+	document.querySelector(".score tr:nth-child(13) td:nth-child(" + playerCategory + ")").innerHTML = get_L_srtaight_score();
+	document.querySelector(".score tr:nth-child(14) td:nth-child(" + playerCategory + ")").innerHTML = getYachtScore();
+}
+
+function removeGuideNumber() {
+	for(var i = 2; i < CATEGORY_COUNT; i++) {
+		if(i == SUB_TOTAL_INDEX) continue;
+		
+		var playerCategory = document.querySelector(".score tr:nth-child(" + i + ") td:nth-child(" + (turn + 1) + ")");
+		
+		if(playerCategory.classList.contains('fixed')) continue;
+		
+		playerCategory.innerHTML = "";
+	}
+}
+
+// ---------------------------------------------
+
+function getDiceDotCount(number) {
+	var count = 0;
+	
+	for(var i = 0; i < resultDices.length; i++) {
+		if(resultDices[i] == number) count += number;
+	}
+	
+	return count;
+}
+
+function getChoiceScore() {
+	var sum = 0;
+	
+	for(var i = 0; i < resultDices.length; i++) {
+		sum += resultDices[i];
+	}
+	
+	return sum;
+}
+
+function get_4_of_kind_score() {
+	var count = 1;
+	var number = 0;
+	var is_4_of_kind = false;
+	
+	for(var i = 0; i < resultDices.length; i++) {
+		if(resultDices[i] == number) {
+			count++;
+			if(count >= 4) is_4_of_kind = true;
+		}
+		else {
+			number = resultDices[i]; 
+			count = 1;
+		}
+	}
+	
+	return is_4_of_kind ? getChoiceScore() : 0;
+}
+
+function getFullHouseScore() {
+	var number = 0;
+	var count = 1;
+	var temp = 0;
+	var isDouble = false;
+	var isTriple = false;
+	
+	for(var i = 0; i < resultDices.length; i++) {
+		if(resultDices[i] == number) {
+			count++;
+			
+			if(count == 3) {
+				if(number == temp) isDouble = false;
+				
+				isTriple = true;
+			}
+			else if(count == 2 &&  !isDouble) {
+				temp = number;
+				isDouble = true;
+			}
+		}
+		else {
+			number = resultDices[i];
+			count = 1;
+		}
+	}
+	
+	return isDouble && isTriple ? getChoiceScore() : 0;
+}
+
+function get_S_srtaight_score() {
+	var count = 1;
+	
+	for(var i = 0; i < resultDices.length - 1; i++) {
+		if(resultDices[i] + 1 == resultDices[i + 1]) count++;
+		else if(resultDices[i] == resultDices[i + 1]) continue;
+		else count = 1;
+	}
+	
+	return count >= 4 ? 15 : 0;
+}
+
+function get_L_srtaight_score() {
+	for(var i = 0; i < resultDices.length - 1; i++) {
+		if(resultDices[i] + 1 != resultDices[i + 1]) return 0;
+	}
+	
+	return 30;
+}
+
+function getYachtScore() {
+	for(var i = 0; i < resultDices.length; i++) {
+		if(resultDices[i] != resultDices[i + 1]) return 0;
+	}
+	
+	return 50;
+}
+
 // ---------------------------------------------
 
 document.addEventListener("DOMContentLoaded", function() {
@@ -588,6 +645,7 @@ function bindEvents() {
 	
 	document.querySelectorAll(".category").forEach(function(element) {
 		element.addEventListener('click', function() {
+			showGuidNumber(false);
 			nextTurn();
 		});
 	});	
