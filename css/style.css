@@ -178,9 +178,15 @@ body {
 	overflow: hidden;
 }
 
+.board .controls {
+	display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
 .board .top-controls {
 	display: flex;
-	justify-content: space-between;
+	justify-content: flex-end;
 	margin-top: 10px;
 }
 
@@ -199,10 +205,6 @@ body {
 	margin-right: 5px;
 }
 
-.board .top-controls .left-chance span {
-	/*vertical-align: baseline;*/
-}
-
 .board .top-controls .left-chance span.number {
 	font-size: 25px;
 	font-weight: 600;
@@ -211,6 +213,33 @@ body {
 .board .top-controls .left-chance span.left {
 	margin-top: 5px;
 	margin-left: 3px;
+}
+
+.board .controls .float {
+	display: flex;
+    flex-direction: row-reverse;
+    margin-right: 100px;
+}
+
+.board .roll {
+	position: fixed;
+    right: 50px;
+    bottom: 0px;
+}
+
+.board .roll img {
+	width: 150px;
+	height: 150px;
+}
+
+.board .roll div {
+	position: absolute;
+	top: 70px;
+    left: 0px;
+    color: #fcfbef;
+	font-size: 50px;
+	font-weight: 900;
+	text-shadow: 2px 2px 1px #333;
 }
 
 .board .selectDiceContainer {

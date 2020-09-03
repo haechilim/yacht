@@ -282,7 +282,7 @@ window.addEventListener('resize', function() {
 });
 
 function bindEvents() {
-	document.querySelector("#reroll").addEventListener('click', function() {
+	document.querySelector("#roll").addEventListener('click', function() {
 		if(leftChance <= 0) return;
 		
 		reroll(function() {
