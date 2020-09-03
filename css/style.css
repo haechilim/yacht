@@ -72,6 +72,13 @@ body {
 	text-align: left;
 }
 
+.score td.category img {
+	width: 18px;
+	height: 18px;
+	vertical-align: text-top;
+	padding-right: 2px;
+}
+
 .score td.number {
 	color: #9a9a9a;
 	font-size: 25px;
