@@ -19,7 +19,7 @@ var SDICE_HEIGHT = 170;
 
 var SCORE_LINE_HEIGHT_RATIO = 21;//19.2;
 
-var CUP_ANIMATION_TIME = 1000;
+var CUP_ANIMATION_TIME = 2000;
 var CUP_SHAKING_INTERVAL = 100;
 
 var center = {};
@@ -105,6 +105,7 @@ function animateCup(oncomplete) {
 	var cup = document.querySelector("#cupImage");
 
 	showCup(true);
+	playShakeSound();
 
 	var timer = setInterval(function() {
 		cup.classList.toggle("shake");

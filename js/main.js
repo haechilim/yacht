@@ -14,6 +14,8 @@ var keepDices = [0, 0, 0, 0, 0];
 var resultDices = [];
 var diceCounts = [0, 0, 0, 0, 0, 0];
 
+var soundTimer;
+
 function init() {
 	initScoreBoard();
 	highlightTurn();
@@ -28,6 +30,7 @@ function rollWithAnimation() {
 		
 	showAllFloatDices(false);
 	showRollButton(false);
+	stopDingSound();
 
 	animateCup(function() {
 		roll(function() {
@@ -39,6 +42,7 @@ function rollWithAnimation() {
 				setTimeout(function() {
 					markSelectable(true);				
 					updateRollButtonVisibility();
+					startDingSound();
 				}, SDICES_ANIMATION_DELAY);
 			}, SDICES_POPUP_DELAY);
 		});
@@ -69,6 +73,7 @@ function roll(oncomplete) {
 	updateResultDices();
 	calculateDiceCounts();
 	showGuidNumber(true);
+	playThrowSound();
 	
 	if(oncomplete) oncomplete();
 	
@@ -131,6 +136,7 @@ function keepDice(number, index) {
 	rollDices.splice(index, 1);
 	fillAtEmptySlot(number);
 	
+	playKeepSound();
 	redrawFloatDices();
 	redrawKeepDices();
 	updateRollButtonVisibility();
@@ -152,6 +158,7 @@ function unkeepDice(number, index) {
 	rollDices.push(number);
 	rollDices.sort();
 	
+	playKeepSound();
 	redrawFloatDices();
 	redrawKeepDices();
 	updateRollButtonVisibility();
@@ -164,6 +171,7 @@ function nextTurn() {
 	keepDices = [0, 0, 0, 0, 0];
 	
 	markSelectable(false);
+	stopDingSound();
 	
 	if(increaseTurn()) {
 		updateGameTurn();
@@ -302,6 +310,34 @@ function calculateDiceCounts() {
 		var index = resultDices[i] - 1;
 		diceCounts[index]++;
 	}
+}
+
+// ---------------------------------------------
+
+function playShakeSound() {
+	playSound("shake");
+}
+
+function playThrowSound() {
+	playSound("result");
+}
+
+function playKeepSound() {
+	playSound("keep");
+}
+
+function startDingSound() {
+	soundTimer = setInterval(function() {
+		playSound("ding");
+	}, 2000);
+}
+
+function stopDingSound() {
+	if(soundTimer) clearInterval(soundTimer);
+}
+
+function playSound(filename) {
+	new Audio("sound/" + filename + ".m4a").play();
 }
 
 // ---------------------------------------------
