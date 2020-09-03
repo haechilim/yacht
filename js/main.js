@@ -1,60 +1,33 @@
+var MAX_GAME_TURN = 12;
 var TOTAL_DICES = 5;
-var CATEGORY_COUNT = 15;
-var SUB_TOTAL_INDEX = 8;
 var PLAYER_COUNT = 3;
 
-var BOARD_WIDTH = 1903;
-var BOARD_HEIGHT = 1077;
-
-var FLOOR_LEFT = -301;
-var FLOOR_TOP = -254;
-var FLOOR_RIGHT = 285;
-var FLOOR_BOTTOM = 283;
-
-var KDICE_WIDTH = 110;
-var KDICE_HEIGHT = 108;
-var KDICE_TOP = -412;
-var KDICE_LEFTS = [ -314, -186, -56, 72, 204 ];
-
-var RDICE_WIDTH = 130;//157;
-var RDICE_HEIGHT = 130;//157;
-
-var SDICE_WIDTH = 170;
-var SDICE_HEIGHT = 170;
-
-var SCORE_LINE_HEIGHT_RATIO = 21;//19.2;
-
 var SDICES_POPUP_DELAY = 1000;
-
-var CUP_ANIMATION_TIME = 1000;
-var CUP_SHAKING_INTERVAL = 100;
-
-var center = {};
-var floorPosition = {};
-var kDicePositions = [];
-var kDiceSize = {};
-var rDiceSize = {};
-var sDiceSize = {};
-
-var leftChance = 3;
-var rollDices = [0, 0, 0, 0, 0];
-var keepDices = [0, 0, 0, 0, 0];
-var resultDices = [0, 0, 0, 0, 0];
+var SDICES_ANIMATION_DELAY = 1000;
 
 var gameTurn = 1;
 var turn = 0;
 
+var leftChance = 3;
+var rollDices = [0, 0, 0, 0, 0];
+var keepDices = [0, 0, 0, 0, 0];
+var resultDices = [];
+var diceCounts = [0, 0, 0, 0, 0, 0];
+
 function init() {
+	initScoreBoard();
+	highlightTurn();
 	showAllKeepDices(false);
 	showAllFloorDices(false);
-	initAllPlayerCategoryStatus();
-	nextTurn();
 }
+
+// ---------------------------------------------
 
 function rollWithAnimation() {
 	if(leftChance <= 0) return;
 		
 	showAllFloatDices(false);
+	showRollButton(false);
 
 	animateCup(function() {
 		roll(function() {
@@ -62,12 +35,16 @@ function rollWithAnimation() {
 				showAllFloorDices(false);
 				redrawFloatDices(true);
 				animateFloatDices();
+				
+				setTimeout(function() {
+					markSelectable(true);				
+					updateRollButtonVisibility();
+				}, SDICES_ANIMATION_DELAY);
 			}, SDICES_POPUP_DELAY);
 		});
 	});
 	
 	decreaseChance();
-	markSelectable(true);
 }
 
 function roll(oncomplete) {
@@ -88,10 +65,9 @@ function roll(oncomplete) {
 		showFloorDice(index, true);
 	}
 	
-	updateResult();
-	resultDices.sort();
 	rollDices.sort();
-	
+	updateResultDices();
+	calculateDiceCounts();
 	showGuidNumber(true);
 	
 	if(oncomplete) oncomplete();
@@ -135,50 +111,38 @@ function roll(oncomplete) {
 		
 		return false;
 	}
-}
-
-function initAllPlayerCategoryStatus() {
-	for(var i = 2; i < CATEGORY_COUNT; i++) {
-		if(i == SUB_TOTAL_INDEX) continue;
+	
+	function updateResultDices() {
+		resultDices = rollDices.concat([]);
 		
-		for(var playerIndex = 2; playerIndex <= PLAYER_COUNT + 1; playerIndex++) {
-			var playerCategory = document.querySelector(".score tr:nth-child(" + i + ") td:nth-child(" + playerIndex + ")");
-			
-			playerCategory.classList.remove('selectable');
-			playerCategory.classList.remove('fixed');
-			playerCategory.innerHTML = "";
-		}
+		keepDices.forEach(function(number) {
+			if(number > 0) resultDices.push(number);
+		});
+		
+		resultDices.sort();
 	}
 }
 
 // ---------------------------------------------
 
-function hideRerollButton() {
-	if(leftChance <= 0) {
-		showRollButton(false);
-		return;
-	}
-	
-	for(var i = 0; i < rollDices.length; i++) {
-		if(rollDices[i] != 0) {
-			showRollButton(true);
-			return;
-		}
-	}
-	
-	showRollButton(false);
-}
-
 function keepDice(number, index) {
 	if(index < 0 || index >= rollDices.length) return;
 	
 	rollDices.splice(index, 1);
-	
-	keepDicePush(number);
+	fillAtEmptySlot(number);
 	
 	redrawFloatDices();
 	redrawKeepDices();
-	hideRerollButton();
+	updateRollButtonVisibility();
+	
+	function fillAtEmptySlot(number) {
+		for(var i = 0; i < keepDices.length; i++) {
+			if(keepDices[i] == 0) {
+				keepDices[i] = number;
+				break;
+			}
+		}
+	}
 }
 
 function unkeepDice(number, index) {
@@ -190,8 +154,10 @@ function unkeepDice(number, index) {
 	
 	redrawFloatDices();
 	redrawKeepDices();
-	hideRerollButton();
+	updateRollButtonVisibility();
 }
+
+//-------------------------------------------------
 
 function nextTurn() {
 	rollDices = [0, 0, 0, 0, 0];
@@ -199,143 +165,44 @@ function nextTurn() {
 	
 	markSelectable(false);
 	
-	increaseTurn();
-	
-	showRollButton(true);
-	showAllFloatDices(false);
-	showAllKeepDices(false);
-	
-	updateChance(leftChance);
-	markAllPlayerBoard(false);
-	markPlayerBoard(true);
-}
-
-function markPlayerBoard() {
-	for(var i = 2; i <= CATEGORY_COUNT; i++) {
-		document.querySelector(".score tr:nth-child(" + i + ") td:nth-child(" + (turn + 1) + ")").classList.add('turn');
+	if(increaseTurn()) {
+		updateGameTurn();
+		highlightTurn();
+		
+		resetChance();
+		showRollButton(true);
+		showAllFloatDices(false);
+		showAllKeepDices(false);
+	}
+	else {
+		// 최종 결과 출력
+		showRollButton(false);
 	}
 }
-
-function markAllPlayerBoard(visible) {
-	for(var i = 2; i <= CATEGORY_COUNT; i++) {
-		var playerBorad = document.querySelector(".score tr:nth-child(" + i + ")");
-		
-		for(var j = 2; j <= PLAYER_COUNT + 1; j++) {
-			if(visible) playerBorad.querySelector("td:nth-child(" + j + ")").classList.add('turn');
-			else playerBorad.querySelector("td:nth-child(" + j + ")").classList.remove('turn');
-		}
-	}
-}
-
-function markSelectable(visible) {
-	for(var i = 2; i < CATEGORY_COUNT; i++) {
-		if(i == SUB_TOTAL_INDEX) continue;
-		
-		var playerCategory = document.querySelector(".score tr:nth-child(" + i + ") td:nth-child(" + (turn + 1) + ")");
-		
-		if(!visible) playerCategory.classList.remove('selectable');
-		else {
-			if(leftChance == 3 || playerCategory.classList.contains('fixed')) continue;
-			playerCategory.classList.add('selectable');
-		}
-	}
-}
-
-//-------------------------------------------------
 
 function increaseTurn() {
 	turn++;
 	
-	if(turn >= 4) {
+	if(turn >= PLAYER_COUNT) {
 		gameTurn++;
-		
-		if(gameTurn >= 13) {
-			showRollButton(false);
-			return;
-		}
-		
-		document.querySelector(".progress").innerHTML = gameTurn + "/12"
+		if(gameTurn > MAX_GAME_TURN) return false;
 	}
 	
-	turn = turn % 4 == 0 ? 1 : turn % 4;
-	leftChance = 3;
-}
-
-function decreaseChance() {
-	leftChance--;
-	updateChance(leftChance);
-}
-
-function keepDicePush(number) {
-	for(var i = 0; i < keepDices.length; i++) {
-		if(keepDices[i] == 0) {
-			keepDices[i] = number;
-			break;
-		}
-	}
+	turn %= PLAYER_COUNT;
+	
+	return true;
 }
 
 // ---------------------------------------------
 
-function determinePositions() {
-	var board = document.querySelector("#board");
-	var ratio = window.innerHeight / BOARD_HEIGHT;
-	
-	center.x = board.offsetWidth / 2;
-	center.y = window.innerHeight / 2
-	
-	kDiceSize.width = KDICE_WIDTH * ratio;
-	kDiceSize.height = KDICE_HEIGHT * ratio;
-	
-	rDiceSize.width = RDICE_WIDTH * ratio;
-	rDiceSize.height = RDICE_HEIGHT * ratio;
-	
-	sDiceSize.width = SDICE_WIDTH * ratio;
-	sDiceSize.height = SDICE_HEIGHT * ratio;
-	
-	for(var i = 0; i< TOTAL_DICES; i++) {
-		var position = {};
-		
-		position.left = KDICE_LEFTS[i] * ratio;
-		position.top = KDICE_TOP * ratio;
-		
-		kDicePositions.push(position);
-	}
-	
-	floorPosition.left = center.x + FLOOR_LEFT * ratio;
-	floorPosition.right = center.x + FLOOR_RIGHT * ratio;
-	floorPosition.top = center.y + FLOOR_TOP * ratio;
-	floorPosition.bottom = center.y + FLOOR_BOTTOM * ratio;
-	floorPosition.width = floorPosition.right - floorPosition.left + 1;
-	floorPosition.height = floorPosition.bottom - floorPosition.top + 1;
+function resetChance() {
+	leftChance = 3;
+	updateChance(leftChance);
 }
-
-function resize() {
-	var board = document.querySelector("#board");
-	var cup = document.querySelector("#cupImage");
-	var score = document.querySelector("#score-container");
 	
-	board.style.height = window.innerHeight + "px";
-	cup.style.height = (window.innerHeight / 2) + "px";
-	score.style.lineHeight = window.innerHeight / SCORE_LINE_HEIGHT_RATIO + "px";
-	
-	for(var i = 0; i < TOTAL_DICES; i++) {
-		var index = i + 1;
-		var dice = document.querySelector(".keepDiceContainer .dice:nth-child(" + index + ")");
-		var pdice = document.querySelector(".rollDiceContainer .dice:nth-child(" + index + ")");	
-		var selectDice = document.querySelector(".selectDiceContainer .dice:nth-child(" + index + ")");	
-		
-		pdice.style.width = rDiceSize.width + "px";
-		pdice.style.height = rDiceSize.height + "px";
-		
-		selectDice.style.width = sDiceSize.width + "px";
-		selectDice.style.height = sDiceSize.height + "px";
-		
-		dice.style.left = (center.x + kDicePositions[i].left) + "px";
-		dice.style.top = (center.y + kDicePositions[i].top) + "px";
-		dice.style.width = kDiceSize.width + "px";
-		dice.style.height = kDiceSize.height + "px";
-	}
+function decreaseChance() {
+	leftChance--;
+	updateChance(leftChance);
 }
 
 // ---------------------------------------------
@@ -362,163 +229,10 @@ function redrawKeepDices() {
 
 // ---------------------------------------------
 
-function animateFloatDices() {
-	setTimeout(function() {
-		document.querySelectorAll(".selectDiceContainer .dice").forEach(function(element) {
-		    element.classList.remove("initial");
-		});
-	}, 10);
-}
-
-function animateCup(oncomplete) {
-	var time = 0;
-	var cup = document.querySelector("#cupImage");
-
-	showCup(true);
-
-	var timer = setInterval(function() {
-		cup.classList.toggle("shake");
-		time += CUP_SHAKING_INTERVAL;
-		
-		if(time >= CUP_ANIMATION_TIME) {
-			clearInterval(timer);
-			if(oncomplete) oncomplete();
-		}
-	}, CUP_SHAKING_INTERVAL);
-}
-
-// ---------------------------------------------
-
-function updateChance(chance) {
-	document.querySelector("#leftChance").innerHTML = chance;
-}
-
-function updateFloorDice(index, number, position) {
-	var dice = document.querySelector(".rollDiceContainer .dice:nth-child(" + (index + 1) + ")");
-	dice.setAttribute( 'src', 'image/pdice' + number + '.png' );
-	dice.style.left = position.left + "px";
-	dice.style.top = position.top + "px";
-}
-
-function updateFloatDice(index, number, readyForAnimimation) {
-	var dice = document.querySelector(".selectDiceContainer .dice:nth-child(" + (index + 1) + ")");
-	dice.setAttribute('src', 'image/dice' + number + '.png');
-	dice.setAttribute('number', number);
-	dice.setAttribute('index', index);
-
-	if(readyForAnimimation) dice.classList.add("initial");
-}
-
-function updateKeepDice(index, number) {
-	var dice = document.querySelector(".keepDiceContainer .dice:nth-child(" + (index + 1) + ")");
-	dice.setAttribute('src', 'image/dice' + number + '.png');
-	dice.setAttribute('number', number);
-	dice.setAttribute('index', index);
-}
-
-function updateResult() {
-	var index = 0;
-	
-	for(var i = 0; i < rollDices.length; i++) {
-		if(rollDices[i] == 0) continue;
-		
-		resultDices[index] = rollDices[i];
-		index++;
-	}
-	
-	for(var i = 0; i < keepDices.length; i++) {
-		if(keepDices[i] == 0) continue;
-		
-		resultDices[index] = keepDices[i];
-		index++;
-	}
-}
-
-// ---------------------------------------------
-
-function showAllKeepDices(visible) {
-	for(var i = 0; i < TOTAL_DICES; i++) {
-		showKeepDice(i, visible);
-	}
-}
-
-function showAllFloorDices(visible) {
-	for(var i = 0; i < TOTAL_DICES; i++) {
-		showFloorDice(i, visible);
-	}
-}
-
-function showAllFloatDices(visible) {
-	for(var i = 0; i < TOTAL_DICES; i++) {
-		showFloatDice(i, visible);
-	}
-}
-
-function showKeepDice(index, visible) {
-	document.querySelector(".keepDiceContainer .dice:nth-child(" + (index + 1) + ")").style.display = visible ? "inline" : "none";
-}
-
-function showFloorDice(index, visible) {
-	document.querySelector(".rollDiceContainer .dice:nth-child(" + (index + 1) + ")").style.display = visible ? "inline" : "none";
-}
-
-function showFloatDice(index, visible) {
-	document.querySelector(".selectDiceContainer .dice:nth-child(" + (index + 1) + ")").style.display = visible ? "inline" : "none";
-}
-
-function showRollButton(visible) {
-	document.querySelector("#roll").style.display = visible ? "flex" : "none";
-}
-
-function showCup(visible) {
-	document.querySelector("#cup").style.display = visible ? "flex" : "none";
-}
-
-function showGuidNumber(visible) {
-	visible ? markGuideNumber() : removeGuideNumber();
-}
-
-// ---------------------------------------------
-
-function markGuideNumber() {
-	var playerCategory = turn + 1;
-	
-	document.querySelector(".score tr:nth-child(2) td:nth-child(" + playerCategory + ")").innerHTML = getDiceDotCount(1);
-	document.querySelector(".score tr:nth-child(3) td:nth-child(" + playerCategory + ")").innerHTML = getDiceDotCount(2);
-	document.querySelector(".score tr:nth-child(4) td:nth-child(" + playerCategory + ")").innerHTML = getDiceDotCount(3);
-	document.querySelector(".score tr:nth-child(5) td:nth-child(" + playerCategory + ")").innerHTML = getDiceDotCount(4);
-	document.querySelector(".score tr:nth-child(6) td:nth-child(" + playerCategory + ")").innerHTML = getDiceDotCount(5);
-	document.querySelector(".score tr:nth-child(7) td:nth-child(" + playerCategory + ")").innerHTML = getDiceDotCount(6);
-	document.querySelector(".score tr:nth-child(9) td:nth-child(" + playerCategory + ")").innerHTML = getChoiceScore();
-	document.querySelector(".score tr:nth-child(10) td:nth-child(" + playerCategory + ")").innerHTML = get_4_of_kind_score();
-	document.querySelector(".score tr:nth-child(11) td:nth-child(" + playerCategory + ")").innerHTML = getFullHouseScore();
-	document.querySelector(".score tr:nth-child(12) td:nth-child(" + playerCategory + ")").innerHTML = get_S_srtaight_score();
-	document.querySelector(".score tr:nth-child(13) td:nth-child(" + playerCategory + ")").innerHTML = get_L_srtaight_score();
-	document.querySelector(".score tr:nth-child(14) td:nth-child(" + playerCategory + ")").innerHTML = getYachtScore();
-}
-
-function removeGuideNumber() {
-	for(var i = 2; i < CATEGORY_COUNT; i++) {
-		if(i == SUB_TOTAL_INDEX) continue;
-		
-		var playerCategory = document.querySelector(".score tr:nth-child(" + i + ") td:nth-child(" + (turn + 1) + ")");
-		
-		if(playerCategory.classList.contains('fixed')) continue;
-		
-		playerCategory.innerHTML = "";
-	}
-}
-
-// ---------------------------------------------
-
 function getDiceDotCount(number) {
-	var count = 0;
-	
-	for(var i = 0; i < resultDices.length; i++) {
-		if(resultDices[i] == number) count += number;
-	}
-	
-	return count;
+	var index = number - 1;
+	if(index < 0 || index >= diceCounts.length) return 0;
+	return diceCounts[index] * number;
 }
 
 function getChoiceScore() {
@@ -531,81 +245,63 @@ function getChoiceScore() {
 	return sum;
 }
 
-function get_4_of_kind_score() {
-	var count = 1;
-	var number = 0;
-	var is_4_of_kind = false;
-	
-	for(var i = 0; i < resultDices.length; i++) {
-		if(resultDices[i] == number) {
-			count++;
-			if(count >= 4) is_4_of_kind = true;
-		}
-		else {
-			number = resultDices[i]; 
-			count = 1;
-		}
+function get4OfKindScore() {
+	for(var i = 0; i < diceCounts.length; i++) {
+		if(diceCounts[i] == 4) return getChoiceScore();
 	}
 	
-	return is_4_of_kind ? getChoiceScore() : 0;
+	return 0;
 }
 
 function getFullHouseScore() {
-	var number = 0;
-	var count = 1;
-	var temp = 0;
-	var isDouble = false;
-	var isTriple = false;
+	var pair, triple;
 	
-	for(var i = 0; i < resultDices.length; i++) {
-		if(resultDices[i] == number) {
-			count++;
-			
-			if(count == 3) {
-				if(number == temp) isDouble = false;
-				
-				isTriple = true;
-			}
-			else if(count == 2 &&  !isDouble) {
-				temp = number;
-				isDouble = true;
-			}
-		}
-		else {
-			number = resultDices[i];
-			count = 1;
-		}
+	for(var i = 0; i < diceCounts.length; i++) {
+		if(diceCounts[i] == 2) pair = true;
+		else if(diceCounts[i] == 3) triple = true;
 	}
 	
-	return isDouble && isTriple ? getChoiceScore() : 0;
+	return (pair && triple) ? getChoiceScore() : 0;
 }
 
-function get_S_srtaight_score() {
-	var count = 1;
-	
-	for(var i = 0; i < resultDices.length - 1; i++) {
-		if(resultDices[i] + 1 == resultDices[i + 1]) count++;
-		else if(resultDices[i] == resultDices[i + 1]) continue;
-		else count = 1;
-	}
-	
-	return count >= 4 ? 15 : 0;
+function getSSrtaightScore() {
+	return checkStraight(false) ? 15 : 0;
 }
 
-function get_L_srtaight_score() {
-	for(var i = 0; i < resultDices.length - 1; i++) {
-		if(resultDices[i] + 1 != resultDices[i + 1]) return 0;
-	}
-	
-	return 30;
+function getLSrtaightScore() {
+	return checkStraight(true) ? 30 : 0;
 }
 
 function getYachtScore() {
-	for(var i = 0; i < resultDices.length; i++) {
-		if(resultDices[i] != resultDices[i + 1]) return 0;
+	for(var i = 0; i < diceCounts.length; i++) {
+		if(diceCounts[i] == 5) return 50;
 	}
 	
-	return 50;
+	return 0;
+}
+
+function checkStraight(large) {
+	var count = 0;
+	var number = large ? 5 : 4;
+	
+	for(var i = 0; i < diceCounts.length; i++) {
+		if(diceCounts[i] == 0) count = 0;
+		else {
+			count++;
+			if(count == number) return true;
+		}
+	}
+	
+	return false;
+}
+
+function calculateDiceCounts() {
+	diceCounts = [0, 0, 0, 0, 0, 0];
+	
+	for(var i = 0; i < resultDices.length; i++) {
+		var index = resultDices[i] - 1;
+		diceCounts[index]++;
+	}
 }
 
 // ---------------------------------------------
@@ -615,11 +311,6 @@ document.addEventListener("DOMContentLoaded", function() {
 	determinePositions();
 	resize();
 	bindEvents();
-});
-
-window.addEventListener('resize', function() {
-	determinePositions();
-	resize();
 });
 
 function bindEvents() {
@@ -648,5 +339,17 @@ function bindEvents() {
 			showGuidNumber(false);
 			nextTurn();
 		});
-	});	
+	});
+	
+	document.addEventListener("contextmenu", function(event) {
+		event.preventDefault();
+	});
+	
+	document.addEventListener("selectstart", function(event) {
+		event.preventDefault();
+	});
+	
+	document.addEventListener("dragstart", function(event) {
+		event.preventDefault();
+	});
 }
