@@ -253,6 +253,27 @@ body {
 	text-shadow: 2px 2px 1px #333;
 }
 
+.board .cupContainer {
+	display: none;
+	justify-content: center;	
+}
+
+.board .cupContainer img {
+	-webkit-transform: rotate(10deg);
+	-webkit-transition-duration:0.1s;
+    -webkit-transition-timing-function: ease-in-out;
+    -webkit-transition-property: transform -webkit-transform;
+    transform: rotate(10deg);
+    transition-duration:0.1s;
+    transition-timing-function: ease-in-out;
+    transition-property: transform -webkit-transformv;
+}
+
+.board .cupContainer img.shake {
+	transform: rotate(-10deg);
+	-webkit-transform: rotate(-10deg);
+}
+
 .board .selectDiceContainer {
 	display: flex;
 	justify-content: center;
@@ -262,7 +283,6 @@ body {
 	display: none;
 	margin: 0px 10px;
 	cursor: pointer;
-
 	-webkit-transition-duration:0.5s;
     -webkit-transition-timing-function: ease-in-out;
     -webkit-transition-property: transform -webkit-transform;

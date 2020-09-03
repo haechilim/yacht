@@ -24,6 +24,9 @@ var SCORE_LINE_HEIGHT_RATIO = 21;//19.2;
 
 var SDICES_POPUP_DELAY = 1000;
 
+var CUP_ANIMATION_TIME = 1000;
+var CUP_SHAKING_INTERVAL = 100;
+
 var center = {};
 var floorPosition = {};
 var kDicePositions = [];
@@ -44,9 +47,28 @@ function init() {
 	nextTurn();
 }
 
-function reroll(oncomplete) {
+function rollWithAnimation() {
+	if(leftChance <= 0) return;
+		
+	showAllFloatDices(false);
+
+	animateCup(function() {
+		roll(function() {
+			setTimeout(function() {
+				showAllFloorDices(false);
+				redrawFloatDices(true);
+				animateFloatDices();
+			}, SDICES_POPUP_DELAY);
+		});
+	});
+	
+	decreaseChance();
+}
+
+function roll(oncomplete) {
 	var positions = [];
 	
+	showCup(false);
 	showAllFloorDices(false);
 	showAllFloatDices(false);
 
@@ -239,18 +261,18 @@ function getYachtScore() {
 
 function hideRerollButton() {
 	if(leftChance <= 0) {
-		showRerollButton(false);
+		showRollButton(false);
 		return;
 	}
 	
 	for(var i = 0; i < rollDices.length; i++) {
 		if(rollDices[i] != 0) {
-			showRerollButton(true);
+			showRollButton(true);
 			return;
 		}
 	}
 	
-	showRerollButton(false);
+	showRollButton(false);
 }
 
 function keepDice(number, index) {
@@ -283,7 +305,7 @@ function nextTurn() {
 	
 	increaseTurn();
 	
-	showRerollButton(true);
+	showRollButton(true);
 	showAllFloatDices(false);
 	showAllKeepDices(false);
 	
@@ -367,9 +389,12 @@ function determinePositions() {
 
 function resize() {
 	var board = document.querySelector("#board");
+	var cup = document.querySelector("#cupImage");
+	var score = document.querySelector("#score-container");
 	
 	board.style.height = window.innerHeight + "px";
-	document.querySelector("#score-container").style.lineHeight = window.innerHeight / SCORE_LINE_HEIGHT_RATIO + "px";
+	cup.style.height = (window.innerHeight / 2) + "px";
+	score.style.lineHeight = window.innerHeight / SCORE_LINE_HEIGHT_RATIO + "px";
 	
 	for(var i = 0; i < TOTAL_DICES; i++) {
 		var index = i + 1;
@@ -412,12 +437,31 @@ function redrawKeepDices() {
 	}
 }
 
+// ---------------------------------------------
+
 function animateFloatDices() {
 	setTimeout(function() {
 		document.querySelectorAll(".selectDiceContainer .dice").forEach(function(element) {
 		    element.classList.remove("initial");
 		});
 	}, 10);
+}
+
+function animateCup(oncomplete) {
+	var time = 0;
+	var cup = document.querySelector("#cupImage");
+
+	showCup(true);
+
+	var timer = setInterval(function() {
+		cup.classList.toggle("shake");
+		time += CUP_SHAKING_INTERVAL;
+		
+		if(time >= CUP_ANIMATION_TIME) {
+			clearInterval(timer);
+			if(oncomplete) oncomplete();
+		}
+	}, CUP_SHAKING_INTERVAL);
 }
 
 // ---------------------------------------------
@@ -499,8 +543,12 @@ function showFloatDice(index, visible) {
 	document.querySelector(".selectDiceContainer .dice:nth-child(" + (index + 1) + ")").style.display = visible ? "inline" : "none";
 }
 
-function showRerollButton(visible) {
-	document.querySelector("#reroll").style.display = visible ? "flex" : "none";
+function showRollButton(visible) {
+	document.querySelector("#roll").style.display = visible ? "flex" : "none";
+}
+
+function showCup(visible) {
+	document.querySelector("#cup").style.display = visible ? "flex" : "none";
 }
 
 // ---------------------------------------------
@@ -519,18 +567,7 @@ window.addEventListener('resize', function() {
 
 function bindEvents() {
 	document.querySelector("#roll").addEventListener('click', function() {
-		if(leftChance <= 0) return;
-		
-		reroll(function() {
-			setTimeout(function() {
-				showAllFloorDices(false);
-				redrawFloatDices(true);
-				animateFloatDices();
-			}, SDICES_POPUP_DELAY);
-		});
-		
-		decreaseChance();
-		hideRerollButton();
+		rollWithAnimation();
 	});
 	
 	document.querySelectorAll(".selectDiceContainer .dice").forEach(function(element) {
