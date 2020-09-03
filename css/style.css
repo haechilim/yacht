@@ -262,6 +262,18 @@ body {
 	display: none;
 	margin: 0px 10px;
 	cursor: pointer;
+
+	-webkit-transition-duration:0.5s;
+    -webkit-transition-timing-function: ease-in-out;
+    -webkit-transition-property: transform -webkit-transform;
+    transition-duration:0.5s;
+    transition-timing-function: ease-in-out;
+    transition-property: transform -webkit-transformv;
+}
+
+.board .selectDiceContainer img.initial {
+    transform: rotate(250deg) scale(0.6);
+    -webkit-transform: rotate(250deg) scale(0.6);
 }
 
 .board .floorDice .dice {

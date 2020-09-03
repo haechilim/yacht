@@ -190,11 +190,11 @@ function resize() {
 
 // ---------------------------------------------
 
-function redrawFloatDices() {
+function redrawFloatDices(readyForAnimimation) {
 	showAllFloatDices(false);
 	
 	for(var index = 0; index < rollDices.length; index++) {
-		updateFloatDice(index, rollDices[index]);
+		updateFloatDice(index, rollDices[index], readyForAnimimation);
 		showFloatDice(index, true);
 	}
 }
@@ -206,6 +206,14 @@ function redrawKeepDices() {
 		updateKeepDice(index, keepDices[index]);
 		showKeepDice(index, true);
 	}
+}
+
+function animateFloatDices() {
+	setTimeout(function() {
+		document.querySelectorAll(".selectDiceContainer .dice").forEach(function(element) {
+		    element.classList.remove("initial");
+		});
+	}, 10);
 }
 
 // ---------------------------------------------
@@ -221,11 +229,13 @@ function updateFloorDice(index, number, position) {
 	dice.style.top = position.top + "px";
 }
 
-function updateFloatDice(index, number) {
+function updateFloatDice(index, number, readyForAnimimation) {
 	var dice = document.querySelector(".selectDiceContainer .dice:nth-child(" + (index + 1) + ")");
 	dice.setAttribute('src', 'image/dice' + number + '.png');
 	dice.setAttribute('number', number);
 	dice.setAttribute('index', index);
+
+	if(readyForAnimimation) dice.classList.add("initial");
 }
 
 function updateKeepDice(index, number) {
@@ -288,7 +298,8 @@ function bindEvents() {
 		reroll(function() {
 			setTimeout(function() {
 				showAllFloorDices(false);
-				redrawFloatDices();
+				redrawFloatDices(true);
+				animateFloatDices();
 			}, SDICES_POPUP_DELAY);
 		});
 		
