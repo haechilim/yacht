@@ -178,14 +178,39 @@ body {
 	overflow: hidden;
 }
 
-.board .leftChance {
+.board .top-controls {
 	display: flex;
 	justify-content: space-between;
 	margin-top: 10px;
-	font-size: 22px;
-	font-weight: 500;
+}
+
+.board .top-controls .left-chance {
+	display: flex;
+	margin-right: 20px;
 	color: #fff;
-	height: 0px;
+	font-size: 18px;
+	font-weight: 300;
+}
+
+.board .top-controls .left-chance img {
+	width: 20px;
+	height: 20px;
+	margin-top: 5px;
+	margin-right: 5px;
+}
+
+.board .top-controls .left-chance span {
+	/*vertical-align: baseline;*/
+}
+
+.board .top-controls .left-chance span.number {
+	font-size: 25px;
+	font-weight: 600;
+}
+
+.board .top-controls .left-chance span.left {
+	margin-top: 5px;
+	margin-left: 3px;
 }
 
 .board .selectDiceContainer {
@@ -196,13 +221,6 @@ body {
 .board .rerollButton {
 	display: flex;
 	margin-left: 20px;
-	height: 50px;
-}
-
-.board .textLeftChanceText {
-	display: flex;
-	margin-right: 20px;
-	height: 50px;
 }
 
 .floorDice .dice {
@@ -220,4 +238,12 @@ body {
 	-ms-filter: drop-shadow(5px 5px 12px rgba(0,0,0,.5));
 	-o-filter: drop-shadow(5px 5px 12px rgba(0,0,0,.5));
 	filter: drop-shadow(5px 5px 12px rgba(0,0,0,.5));
+}
+
+.drop-shadow-1 {
+	-webkit-filter: drop-shadow(1px 1px 1px #000);
+	-moz-filter: drop-shadow(1px 1px 1px #000);
+	-ms-filter: drop-shadow(1px 1px 1px #000);
+	-o-filter: drop-shadow(1px 1px 1px #000);
+	filter: drop-shadow(1px 1px 1px #000);
 }
