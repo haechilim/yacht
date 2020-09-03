@@ -2,6 +2,7 @@ body {
 	margin: 0px;
 	background-color: #fcfbef;
 	font-family: 'Montserrat', sans-serif;
+	cursor: default;
 }
 
 .container {
@@ -92,6 +93,15 @@ body {
 
 .score tr td.turn {
 	background-color: #fde570;
+}
+
+.score tr td.selectable {
+	cursor: pointer;
+}
+
+.score tr td.selectable:hover {
+	color: #fff;
+	background-color: #fc601f;
 }
 
 .score tr.subtotal td {
@@ -225,6 +235,7 @@ body {
 	position: fixed;
     right: 50px;
     bottom: 0px;
+    cursor: pointer;
 }
 
 .board .roll img {
@@ -247,18 +258,18 @@ body {
 	justify-content: center;
 }
 
-.board .rerollButton {
-	display: flex;
-	margin-left: 20px;
+.board .selectDiceContainer .dice {
+	display: none;
+	margin: 0px 10px;
+	cursor: pointer;
 }
 
-.floorDice .dice {
+.board .floorDice .dice {
 	position: absolute;
 }
 
-.selectDiceContainer .dice {
-	display: none;
-	margin: 0px 10px;
+.board .keepDiceContainer .dice {
+	cursor: pointer;
 }
 
 .drop-shadow {
