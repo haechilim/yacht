@@ -211,7 +211,7 @@ function redrawKeepDices() {
 // ---------------------------------------------
 
 function updateChance(chance) {
-	document.querySelector(".textLeftChanceText").innerHTML = chance + " left";
+	document.querySelector("#leftChance").innerHTML = chance;
 }
 
 function updateFloorDice(index, number, position) {

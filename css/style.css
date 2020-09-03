@@ -233,17 +233,25 @@ body {
 }
 
 .drop-shadow {
-	-webkit-filter: drop-shadow(5px 5px 12px rgba(0,0,0,.5));
-	-moz-filter: drop-shadow(5px 5px 12px rgba(0,0,0,.5));
-	-ms-filter: drop-shadow(5px 5px 12px rgba(0,0,0,.5));
-	-o-filter: drop-shadow(5px 5px 12px rgba(0,0,0,.5));
-	filter: drop-shadow(5px 5px 12px rgba(0,0,0,.5));
+	-webkit-filter: drop-shadow(5px 5px 10px rgba(0,0,0,.5));
+	-moz-filter: drop-shadow(5px 5px 10px rgba(0,0,0,.5));
+	-ms-filter: drop-shadow(5px 5px 10px rgba(0,0,0,.5));
+	-o-filter: drop-shadow(5px 5px 10px rgba(0,0,0,.5));
+	filter: drop-shadow(5px 5px 10px rgba(0,0,0,.5));
 }
 
-.drop-shadow-1 {
+.drop-shadow-light {
 	-webkit-filter: drop-shadow(1px 1px 1px #000);
 	-moz-filter: drop-shadow(1px 1px 1px #000);
 	-ms-filter: drop-shadow(1px 1px 1px #000);
 	-o-filter: drop-shadow(1px 1px 1px #000);
 	filter: drop-shadow(1px 1px 1px #000);
+}
+
+.drop-shadow-strong {
+	-webkit-filter: drop-shadow(20px 20px 10px rgba(0,0,0,0.5));
+	-moz-filter: drop-shadow(20px 20px 10px rgba(0,0,0,0.5));
+	-ms-filter: drop-shadow(20px 20px 10px rgba(0,0,0,0.5));
+	-o-filter: drop-shadow(20px 20px 10px rgba(0,0,0,0.5));
+	filter: drop-shadow(20px 20px 10px rgba(0,0,0,0.5));
 }
