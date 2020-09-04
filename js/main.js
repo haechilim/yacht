@@ -16,9 +16,256 @@ var diceCounts = [0, 0, 0, 0, 0, 0];
 
 var soundTimer;
 
+var players = [
+	{
+		id: 1,
+		avatar: 1,
+		categories: [
+			{	
+				name: "aces",
+				fixed: false,
+				selectable: false,
+				score: 0
+			},
+			{	
+				name: "deuces",
+				fixed: false,
+				selectable: false,
+				score: 0
+			},
+			{	
+				name: "threes",
+				fixed: false,
+				selectable: false,
+				score: 0
+			},
+			{	
+				name: "fours",
+				fixed: false,
+				selectable: false,
+				score: 0
+			},
+			{	
+				name: "fives",
+				fixed: false,
+				selectable: false,
+				score: 0
+			},
+			{	
+				name: "sixes",
+				fixed: false,
+				selectable: false,
+				score: 0
+			},
+			{	
+				name: "choice",
+				fixed: false,
+				selectable: false,
+				score: 0
+			},
+			{	
+				name: "kind",
+				fixed: false,
+				selectable: false,
+				score: 0
+			},
+			{	
+				name: "full_house",
+				fixed: false,
+				selectable: false,
+				score: 0
+			},
+			{	
+				name: "S_straight",
+				fixed: false,
+				selectable: false,
+				score: 0
+			},
+			{	
+				name: "L_straight",
+				fixed: false,
+				selectable: false,
+				score: 0
+			},
+			{	
+				name: "yacht",
+				fixed: false,
+				selectable: false,
+				score: 0
+			},
+		],
+		subtotal: 0,
+		isBonus: false,
+		total: 0,
+	},
+	{
+		id: 2,
+		avatar: 3,
+		categories: [
+			{	
+				name: "aces",
+				fixed: false,
+				selectable: false,
+				score: 0
+			},
+			{	
+				name: "deuces",
+				fixed: false,
+				selectable: false,
+				score: 0
+			},
+			{	
+				name: "threes",
+				fixed: false,
+				selectable: false,
+				score: 0
+			},
+			{	
+				name: "fours",
+				fixed: false,
+				selectable: false,
+				score: 0
+			},
+			{	
+				name: "fives",
+				fixed: false,
+				selectable: false,
+				score: 0
+			},
+			{	
+				name: "sixes",
+				fixed: false,
+				selectable: false,
+				score: 0
+			},
+			{	
+				name: "choice",
+				fixed: false,
+				selectable: false,
+				score: 0
+			},
+			{	
+				name: "kind",
+				fixed: false,
+				selectable: false,
+				score: 0
+			},
+			{	
+				name: "full_house",
+				fixed: false,
+				selectable: false,
+				score: 0
+			},
+			{	
+				name: "S_straight",
+				fixed: false,
+				selectable: false,
+				score: 0
+			},
+			{	
+				name: "L_straight",
+				fixed: false,
+				selectable: false,
+				score: 0
+			},
+			{	
+				name: "yacht",
+				fixed: false,
+				selectable: false,
+				score: 0
+			},
+		],
+		subtotal: 0,
+		isBonus: false,
+		total: 0,
+	},
+	{
+		id: 3,
+		avatar: 6,
+		categories: [
+			{	
+				name: "aces",
+				fixed: false,
+				selectable: false,
+				score: 0
+			},
+			{	
+				name: "deuces",
+				fixed: false,
+				selectable: false,
+				score: 0
+			},
+			{	
+				name: "threes",
+				fixed: false,
+				selectable: false,
+				score: 0
+			},
+			{	
+				name: "fours",
+				fixed: false,
+				selectable: false,
+				score: 0
+			},
+			{	
+				name: "fives",
+				fixed: false,
+				selectable: false,
+				score: 0
+			},
+			{	
+				name: "sixes",
+				fixed: false,
+				selectable: false,
+				score: 0
+			},
+			{	
+				name: "choice",
+				fixed: false,
+				selectable: false,
+				score: 0
+			},
+			{	
+				name: "kind",
+				fixed: false,
+				selectable: false,
+				score: 0
+			},
+			{	
+				name: "full_house",
+				fixed: false,
+				selectable: false,
+				score: 0
+			},
+			{	
+				name: "S_straight",
+				fixed: false,
+				selectable: false,
+				score: 0
+			},
+			{	
+				name: "L_straight",
+				fixed: false,
+				selectable: false,
+				score: 0
+			},
+			{	
+				name: "yacht",
+				fixed: false,
+				selectable: false,
+				score: 0
+			},
+		],
+		subtotal: 0,
+		isBonus: false,
+		total: 0,
+	}
+];
+
 function init() {
-	initScoreBoard();
-	highlightTurn();
+	updateTable();
+	//initScoreBoard();
+	//highlightTurn();
 	showAllKeepDices(false);
 	showAllFloorDices(false);
 }
@@ -40,7 +287,9 @@ function rollWithAnimation() {
 				animateFloatDices();
 				
 				setTimeout(function() {
-					markSelectable(true);				
+					updateSelectable(true);
+					updateTable();
+					showGuideNumber(true);
 					updateRollButtonVisibility();
 					startDingSound();
 				}, SDICES_ANIMATION_DELAY);
@@ -72,7 +321,6 @@ function roll(oncomplete) {
 	rollDices.sort();
 	updateResultDices();
 	calculateDiceCounts();
-	showGuidNumber(true);
 	playThrowSound();
 	
 	if(oncomplete) oncomplete();
@@ -170,12 +418,12 @@ function nextTurn() {
 	rollDices = [0, 0, 0, 0, 0];
 	keepDices = [0, 0, 0, 0, 0];
 	
-	markSelectable(false);
+	updateSelectable(false);
 	stopDingSound();
 	
 	if(increaseTurn()) {
 		updateGameTurn();
-		highlightTurn();
+		//highlightTurn();
 		
 		resetChance();
 		showRollButton(true);
@@ -351,6 +599,8 @@ document.addEventListener("DOMContentLoaded", function() {
 
 function bindEvents() {
 	document.querySelector("#roll").addEventListener('click', function() {
+		updateSelectable(false);
+		updateTable();
 		rollWithAnimation();
 	});
 	
@@ -369,13 +619,6 @@ function bindEvents() {
 			unkeepDice(number, index);
 		});
 	});	
-	
-	document.querySelectorAll(".category").forEach(function(element) {
-		element.addEventListener('click', function() {
-			showGuidNumber(false);
-			nextTurn();
-		});
-	});
 	
 	document.addEventListener("contextmenu", function(event) {
 		event.preventDefault();
