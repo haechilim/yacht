@@ -10,6 +10,8 @@ function updateTable() {
 }
 
 function header() {
+	resetplayerIndex();
+	
 	return '<table class="score">' +
 				'<tr>' +
 					'<th class="turn bottom-tborder">' + 
@@ -18,15 +20,70 @@ function header() {
 						'<div class="categories">Categories</div>' +
 					'</th>' +
 					'<th class="player top-tborder bottom-border left-tborder">' +
-						'<img src="image/avatar/avatar' + players[0].avatar + '.png"/>' +
+						'<img src="image/avatar/avatar' + players[playerIndex++].avatar + '.png"/>' +
 					'</th>' +
-					'<th class="player top-tborder bottom-border left-border">' +
-						'<img src="image/avatar/avatar' + players[1].avatar + '.png"/>' +
-					'</th>' +
+					tableHeader() +
 					'<th class="player top-tborder bottom-border left-border right-tborder">' +
-						'<img src="image/avatar/avatar' + players[2].avatar + '.png"/>' +
+						'<img src="image/avatar/avatar' + players[playerIndex].avatar + '.png"/>' +
 					'</th>' +
 				'</tr>';
+}
+
+function tableHeader() {
+	var str = "";
+	
+	for(var i = playerIndex; i < PLAYER_COUNT - 1; i++) {
+		str +=  '<th class="player top-tborder bottom-border left-border">' +
+					'<img src="image/avatar/avatar' + players[playerIndex++].avatar + '.png"/>' +
+				'</th>';
+	}
+	
+	return str;
+}
+
+function tableCategoy(index) {
+	var str = "";
+	playerIndex++;
+	
+	for(var i = playerIndex; i < PLAYER_COUNT - 1; i++) {
+		str +=  '<td class="number ' + (players[playerIndex].categories[index].fixed ? "fixed" : "") + ' ' + (turn == playerIndex ? "turn" : "") + ' ' + (players[playerIndex].categories[index].selectable ? "selectable" : "") + '">' + (players[playerIndex].categories[index].fixed ? players[playerIndex].categories[index].score : "") + '</td>';
+		
+		playerIndex++;
+	}
+	
+	return str;
+}
+
+function tableSubtotal() {
+	var str = "";
+	
+	for(var i = playerIndex; i < PLAYER_COUNT - 1; i++) {
+		str +=  '<td class="number">' +
+					'<div class="subtotal">' + players[playerIndex].subtotal + '/63</div>' +
+					'<div class="bonus">' + (players[playerIndex++].isBonus ? "+35" : "+0") + '</div>' +
+				'</td>';
+	}
+	
+	return str;
+}
+
+function tableTotal() {
+	var str = "";
+	playerIndex++;
+	
+	for(var i = playerIndex; i < PLAYER_COUNT - 1; i++) {
+		str +=  '<td class="number ' + (turn == playerIndex ? "turn" : "") + ' bottom-tborder">' + players[playerIndex].total + '</td>';
+		
+		playerIndex++;
+	}
+	
+	return str;
+}
+
+function resetplayerIndex() {
+	playerIndex = 0;
+	
+	return playerIndex;
 }
  
 function upper() {
@@ -34,49 +91,49 @@ function upper() {
 					'<td class="category left-tborder">' +
 						'<img src="image/deco/dice1.png"/>Aces' +
 					'</td>' +
-					'<td class="number ' + (players[0].categories[0].fixed ? "fixed" : "") + ' ' + (turn == 0 ? "turn" : "") + ' ' + (players[0].categories[0].selectable ? "selectable" : "") + '">' + (players[0].categories[0].fixed ? players[0].categories[0].score : "") + '</td>' + 
-					'<td class="number ' + (players[1].categories[0].fixed ? "fixed" : "") + ' ' + (turn == 1 ? "turn" : "") + ' ' + (players[1].categories[0].selectable ? "selectable" : "") + '">' + (players[1].categories[0].fixed ? players[1].categories[0].score : "") + '</td>' +
-					'<td class="number ' + (players[2].categories[0].fixed ? "fixed" : "") + ' ' + (turn == 2 ? "turn" : "") + ' ' + (players[2].categories[0].selectable ? "selectable" : "") + ' right-tborder">' + (players[2].categories[0].fixed ? players[2].categories[0].score : "") + '</td>' +
+					'<td class="number ' + (players[resetplayerIndex()].categories[0].fixed ? "fixed" : "") + ' ' + (turn == playerIndex ? "turn" : "") + ' ' + (players[playerIndex].categories[0].selectable ? "selectable" : "") + '">' + (players[playerIndex].categories[0].fixed ? players[playerIndex].categories[0].score : "") + '</td>' + 
+					tableCategoy(0) +
+					'<td class="number ' + (players[playerIndex].categories[0].fixed ? "fixed" : "") + ' ' + (turn == playerIndex ? "turn" : "") + ' ' + (players[playerIndex].categories[0].selectable ? "selectable" : "") + ' right-tborder">' + (players[playerIndex].categories[0].fixed ? players[playerIndex].categories[0].score : "") + '</td>' +
 				'</tr>' +
 				'<tr class="deuces">' +
 					'<td class="category left-tborder">' +
 						'<img src="image/deco/dice2.png"/>Deuces' +
 					'</td>' +
-					'<td class="number ' + (players[0].categories[1].fixed ? "fixed" : "") + ' ' + (turn == 0 ? "turn" : "") + ' ' + (players[0].categories[1].selectable ? "selectable" : "") + '">' + (players[0].categories[1].fixed ? players[0].categories[1].score : "") + '</td>' +
-					'<td class="number ' + (players[1].categories[1].fixed ? "fixed" : "") + ' ' + (turn == 1 ? "turn" : "") + ' ' + (players[1].categories[1].selectable ? "selectable" : "") + '">' + (players[1].categories[1].fixed ? players[1].categories[1].score : "") + '</td>' +
-					'<td class="number ' + (players[2].categories[1].fixed ? "fixed" : "") + ' ' + (turn == 2 ? "turn" : "") + ' ' + (players[2].categories[1].selectable ? "selectable" : "") + ' right-tborder">' + (players[2].categories[1].fixed ? players[2].categories[1].score : "") + '</td>' +
+					'<td class="number ' + (players[resetplayerIndex()].categories[1].fixed ? "fixed" : "") + ' ' + (turn == playerIndex ? "turn" : "") + ' ' + (players[playerIndex].categories[1].selectable ? "selectable" : "") + '">' + (players[playerIndex].categories[1].fixed ? players[playerIndex].categories[1].score : "") + '</td>' +
+					tableCategoy(1) +
+					'<td class="number ' + (players[playerIndex].categories[1].fixed ? "fixed" : "") + ' ' + (turn == playerIndex ? "turn" : "") + ' ' + (players[playerIndex].categories[1].selectable ? "selectable" : "") + ' right-tborder">' + (players[playerIndex].categories[1].fixed ? players[playerIndex].categories[1].score : "") + '</td>' +
 				'</tr>' +
 				'<tr class="threes">' +
 					'<td class="category left-tborder">' +
 						'<img src="image/deco/dice3.png"/>Threes' +
 					'</td>' +
-					'<td class="number ' + (players[0].categories[2].fixed ? "fixed" : "") + ' ' + (turn == 0 ? "turn" : "") + ' ' + (players[0].categories[2].selectable ? "selectable" : "") + '">' + (players[0].categories[2].fixed ? players[0].categories[2].score : "") + '</td>' +
-					'<td class="number ' + (players[1].categories[2].fixed ? "fixed" : "") + ' ' + (turn == 1 ? "turn" : "") + ' ' + (players[1].categories[2].selectable ? "selectable" : "") + '">' + (players[1].categories[2].fixed ? players[1].categories[2].score : "") + '</td>' +
-					'<td class="number ' + (players[2].categories[2].fixed ? "fixed" : "") + ' ' + (turn == 2 ? "turn" : "") + ' ' + (players[2].categories[2].selectable ? "selectable" : "") + ' right-tborder">' + (players[2].categories[2].fixed ? players[2].categories[2].score : "") + '</td>' +
+					'<td class="number ' + (players[resetplayerIndex()].categories[2].fixed ? "fixed" : "") + ' ' + (turn == playerIndex ? "turn" : "") + ' ' + (players[playerIndex].categories[2].selectable ? "selectable" : "") + '">' + (players[playerIndex].categories[2].fixed ? players[playerIndex].categories[2].score : "") + '</td>' +
+					tableCategoy(2) +
+					'<td class="number ' + (players[playerIndex].categories[2].fixed ? "fixed" : "") + ' ' + (turn == playerIndex ? "turn" : "") + ' ' + (players[playerIndex].categories[2].selectable ? "selectable" : "") + ' right-tborder">' + (players[playerIndex].categories[2].fixed ? players[playerIndex].categories[2].score : "") + '</td>' +
 				'</tr>' +
 				'<tr class="fours">' +
 					'<td class="category left-tborder">' +
 						'<img src="image/deco/dice4.png"/>Fours' +
 					'</td>' +
-					'<td class="number ' + (players[0].categories[3].fixed ? "fixed" : "") + ' ' + (turn == 0 ? "turn" : "") + ' ' + (players[0].categories[3].selectable ? "selectable" : "") + '">' + (players[0].categories[3].fixed ? players[0].categories[3].score : "") + '</td>' +
-					'<td class="number ' + (players[1].categories[3].fixed ? "fixed" : "") + ' ' + (turn == 1 ? "turn" : "") + ' ' + (players[1].categories[3].selectable ? "selectable" : "") + '">' + (players[1].categories[3].fixed ? players[1].categories[3].score : "") + '</td>' +
-					'<td class="number ' + (players[2].categories[3].fixed ? "fixed" : "") + ' ' + (turn == 2 ? "turn" : "") + ' ' + (players[2].categories[3].selectable ? "selectable" : "") + ' right-tborder">' + (players[2].categories[3].fixed ? players[2].categories[3].score : "") + '</td>' +
+					'<td class="number ' + (players[resetplayerIndex()].categories[3].fixed ? "fixed" : "") + ' ' + (turn == playerIndex ? "turn" : "") + ' ' + (players[playerIndex].categories[3].selectable ? "selectable" : "") + '">' + (players[playerIndex].categories[3].fixed ? players[playerIndex].categories[3].score : "") + '</td>' +
+					tableCategoy(3) +
+					'<td class="number ' + (players[playerIndex].categories[3].fixed ? "fixed" : "") + ' ' + (turn == playerIndex ? "turn" : "") + ' ' + (players[playerIndex].categories[3].selectable ? "selectable" : "") + ' right-tborder">' + (players[playerIndex].categories[3].fixed ? players[playerIndex].categories[3].score : "") + '</td>' +
 				'</tr>' +
 				'<tr class="fives">' +
 					'<td class="category left-tborder">' +
 						'<img src="image/deco/dice5.png"/>Fives' +
 					'</td>' +
-					'<td class="number ' + (players[0].categories[4].fixed ? "fixed" : "") + ' ' + (turn == 0 ? "turn" : "") + ' ' + (players[0].categories[4].selectable ? "selectable" : "") + '">' + (players[0].categories[4].fixed ? players[0].categories[4].score : "") + '</td>' +
-					'<td class="number ' + (players[1].categories[4].fixed ? "fixed" : "") + ' ' + (turn == 1 ? "turn" : "") + ' ' + (players[1].categories[4].selectable ? "selectable" : "") + '">' + (players[1].categories[4].fixed ? players[1].categories[4].score : "") + '</td>' +
-					'<td class="number ' + (players[2].categories[4].fixed ? "fixed" : "") + ' ' + (turn == 2 ? "turn" : "") + ' ' + (players[2].categories[4].selectable ? "selectable" : "") + ' right-tborder">' + (players[2].categories[4].fixed ? players[2].categories[4].score : "") + '</td>' +
+					'<td class="number ' + (players[resetplayerIndex()].categories[4].fixed ? "fixed" : "") + ' ' + (turn == playerIndex ? "turn" : "") + ' ' + (players[playerIndex].categories[4].selectable ? "selectable" : "") + '">' + (players[playerIndex].categories[4].fixed ? players[playerIndex].categories[4].score : "") + '</td>' +
+					tableCategoy(4) +
+					'<td class="number ' + (players[playerIndex].categories[4].fixed ? "fixed" : "") + ' ' + (turn == playerIndex ? "turn" : "") + ' ' + (players[playerIndex].categories[4].selectable ? "selectable" : "") + ' right-tborder">' + (players[playerIndex].categories[4].fixed ? players[playerIndex].categories[4].score : "") + '</td>' +
 				'</tr>' +
 				'<tr class="sixes">' +
 					'<td class="category left-tborder">' +
 						'<img src="image/deco/dice6.png"/>Sixes' +
 					'</td>' +
-					'<td class="number ' + (players[0].categories[5].fixed ? "fixed" : "") + ' ' + (turn == 0 ? "turn" : "") + ' ' + (players[0].categories[5].selectable ? "selectable" : "") + '">' + (players[0].categories[5].fixed ? players[0].categories[5].score : "") + '</td>' +
-					'<td class="number ' + (players[1].categories[5].fixed ? "fixed" : "") + ' ' + (turn == 1 ? "turn" : "") + ' ' + (players[1].categories[5].selectable ? "selectable" : "") + '">' + (players[1].categories[5].fixed ? players[1].categories[5].score : "") + '</td>' +
-					'<td class="number ' + (players[2].categories[5].fixed ? "fixed" : "") + ' ' + (turn == 2 ? "turn" : "") + ' ' + (players[2].categories[5].selectable ? "selectable" : "") + ' right-tborder">' + (players[2].categories[5].fixed ? players[2].categories[5].score : "") + '</td>' +
+					'<td class="number ' + (players[resetplayerIndex()].categories[5].fixed ? "fixed" : "") + ' ' + (turn == playerIndex ? "turn" : "") + ' ' + (players[playerIndex].categories[5].selectable ? "selectable" : "") + '">' + (players[playerIndex].categories[5].fixed ? players[playerIndex].categories[5].score : "") + '</td>' +
+					tableCategoy(5) +
+					'<td class="number ' + (players[playerIndex].categories[5].fixed ? "fixed" : "") + ' ' + (turn == playerIndex ? "turn" : "") + ' ' + (players[playerIndex].categories[5].selectable ? "selectable" : "") + ' right-tborder">' + (players[playerIndex].categories[5].fixed ? players[playerIndex].categories[5].score : "") + '</td>' +
 				'</tr>' +
 				
 				'<tr class="subtotal">' +
@@ -85,16 +142,13 @@ function upper() {
 						'<div class="bonus">+35 Bonus</div>' +
 					'</td>' +
 					'<td class="number">' +
-						'<div class="subtotal">' + players[0].subtotal + '/63</div>' +
-						'<div class="bonus">' + (players[0].isBonus ? "+35" : "+0") + '</div>' +
+						'<div class="subtotal">' + players[resetplayerIndex()].subtotal + '/63</div>' +
+						'<div class="bonus">' + (players[playerIndex++].isBonus ? "+35" : "+0") + '</div>' +
 					'</td>' +
-					'<td class="number">' +
-						'<div class="subtotal">' + players[1].subtotal + '/63</div>' +
-						'<div class="bonus">' + (players[1].isBonus ? "+35" : "+0") + '</div>' +
-					'</td>' +
+					tableSubtotal() +
 					'<td class="number right-tborder">' +
-						'<div class="subtotal">' + players[2].subtotal + '/63</div>' +
-						'<div class="bonus">' + (players[2].isBonus ? "+35" : "+0") + '</div>' +
+						'<div class="subtotal">' + players[playerIndex].subtotal + '/63</div>' +
+						'<div class="bonus">' + (players[playerIndex].isBonus ? "+35" : "+0") + '</div>' +
 					'</td>' +
 				'</tr>';
 }
@@ -104,56 +158,56 @@ function lower() {
 					'<td class="category left-tborder">' +
 						'<img src="image/deco/choice.png"/>Choice' +
 					'</td>' +
-					'<td class="number ' + (players[0].categories[6].fixed ? "fixed" : "") + ' ' + (turn == 0 ? "turn" : "") + ' ' + (players[0].categories[6].selectable ? "selectable" : "") + '">' + (players[0].categories[6].fixed ? players[0].categories[6].score : "") + '</td>' +
-					'<td class="number ' + (players[1].categories[6].fixed ? "fixed" : "") + ' ' + (turn == 1 ? "turn" : "") + ' ' + (players[1].categories[6].selectable ? "selectable" : "") + '">' + (players[1].categories[6].fixed ? players[1].categories[6].score : "") + '</td>' +
-					'<td class="number ' + (players[2].categories[6].fixed ? "fixed" : "") + ' ' + (turn == 2 ? "turn" : "") + ' ' + (players[2].categories[6].selectable ? "selectable" : "") + ' right-tborder">' + (players[2].categories[6].fixed ? players[2].categories[6].score : "") + '</td>' +
+					'<td class="number ' + (players[resetplayerIndex()].categories[6].fixed ? "fixed" : "") + ' ' + (turn == playerIndex ? "turn" : "") + ' ' + (players[playerIndex].categories[6].selectable ? "selectable" : "") + '">' + (players[playerIndex].categories[6].fixed ? players[playerIndex].categories[6].score : "") + '</td>' +
+					tableCategoy(6) +
+					'<td class="number ' + (players[playerIndex].categories[6].fixed ? "fixed" : "") + ' ' + (turn == playerIndex ? "turn" : "") + ' ' + (players[playerIndex].categories[6].selectable ? "selectable" : "") + ' right-tborder">' + (players[playerIndex].categories[6].fixed ? players[playerIndex].categories[6].score : "") + '</td>' +
 				'</tr>' +
 				'<tr class="kind">' +
 					'<td class="category left-tborder">' +
 						'<img src="image/deco/kind.png"/>4 of a kind' +
 					'</td>' +
-					'<td class="number ' + (players[0].categories[7].fixed ? "fixed" : "") + ' ' + (turn == 0 ? "turn" : "") + ' ' + (players[0].categories[7].selectable ? "selectable" : "") + '">' + (players[0].categories[7].fixed ? players[0].categories[7].score : "") + '</td>' +
-					'<td class="number ' + (players[1].categories[7].fixed ? "fixed" : "") + ' ' + (turn == 1 ? "turn" : "") + ' ' + (players[1].categories[7].selectable ? "selectable" : "") + '">' + (players[1].categories[7].fixed ? players[1].categories[7].score : "") + '</td>' +
-					'<td class="number ' + (players[2].categories[7].fixed ? "fixed" : "") + ' ' + (turn == 2 ? "turn" : "") + ' ' + (players[2].categories[7].selectable ? "selectable" : "") + ' right-tborder">' + (players[2].categories[7].fixed ? players[2].categories[7].score : "") + '</td>' +
+					'<td class="number ' + (players[resetplayerIndex()].categories[7].fixed ? "fixed" : "") + ' ' + (turn == playerIndex ? "turn" : "") + ' ' + (players[playerIndex].categories[7].selectable ? "selectable" : "") + '">' + (players[playerIndex].categories[7].fixed ? players[playerIndex].categories[7].score : "") + '</td>' +
+					tableCategoy(7) +
+					'<td class="number ' + (players[playerIndex].categories[7].fixed ? "fixed" : "") + ' ' + (turn == playerIndex ? "turn" : "") + ' ' + (players[playerIndex].categories[7].selectable ? "selectable" : "") + ' right-tborder">' + (players[playerIndex].categories[7].fixed ? players[playerIndex].categories[7].score : "") + '</td>' +
 				'</tr>' +
 				'<tr class="full-house">' +
 					'<td class="category left-tborder">' +
 						'<img src="image/deco/fullhouse.png"/>Full House' +
 					'</td>' +
-					'<td class="number ' + (players[0].categories[8].fixed ? "fixed" : "") + ' ' + (turn == 0 ? "turn" : "") + ' ' + (players[0].categories[8].selectable ? "selectable" : "") + '">' + (players[0].categories[8].fixed ? players[0].categories[8].score : "") + '</td>' +
-					'<td class="number ' + (players[1].categories[8].fixed ? "fixed" : "") + ' ' + (turn == 1 ? "turn" : "") + ' ' + (players[1].categories[8].selectable ? "selectable" : "") + '">' + (players[1].categories[8].fixed ? players[1].categories[8].score : "") + '</td>' +
-					'<td class="number ' + (players[2].categories[8].fixed ? "fixed" : "") + ' ' + (turn == 2 ? "turn" : "") + ' ' + (players[2].categories[8].selectable ? "selectable" : "") + ' right-tborder">' + (players[2].categories[8].fixed ? players[2].categories[8].score : "") + '</td>' +
+					'<td class="number ' + (players[resetplayerIndex()].categories[8].fixed ? "fixed" : "") + ' ' + (turn == playerIndex ? "turn" : "") + ' ' + (players[playerIndex].categories[8].selectable ? "selectable" : "") + '">' + (players[playerIndex].categories[8].fixed ? players[playerIndex].categories[8].score : "") + '</td>' +
+					tableCategoy(8) +
+					'<td class="number ' + (players[playerIndex].categories[8].fixed ? "fixed" : "") + ' ' + (turn == playerIndex ? "turn" : "") + ' ' + (players[playerIndex].categories[8].selectable ? "selectable" : "") + ' right-tborder">' + (players[playerIndex].categories[8].fixed ? players[playerIndex].categories[8].score : "") + '</td>' +
 				'</tr>' +
 				'<tr class="s-straight">' +
 					'<td class="category left-tborder">' +
 						'<img src="image/deco/sstraight.png"/>S. Straight' +
 					'</td>' +
-					'<td class="number ' + (players[0].categories[9].fixed ? "fixed" : "") + ' ' + (turn == 0 ? "turn" : "") + ' ' + (players[0].categories[9].selectable ? "selectable" : "") + '">' + (players[0].categories[9].fixed ? players[0].categories[9].score : "") + '</td>' +
-					'<td class="number ' + (players[1].categories[9].fixed ? "fixed" : "") + ' ' + (turn == 1 ? "turn" : "") + ' ' + (players[1].categories[9].selectable ? "selectable" : "") + '">' + (players[1].categories[9].fixed ? players[1].categories[9].score : "") + '</td>' +
-					'<td class="number ' + (players[2].categories[9].fixed ? "fixed" : "") + ' ' + (turn == 2 ? "turn" : "") + ' ' + (players[2].categories[9].selectable ? "selectable" : "") + ' right-tborder">' + (players[2].categories[9].fixed ? players[2].categories[9].score : "") + '</td>' +
+					'<td class="number ' + (players[resetplayerIndex()].categories[9].fixed ? "fixed" : "") + ' ' + (turn == playerIndex ? "turn" : "") + ' ' + (players[playerIndex].categories[9].selectable ? "selectable" : "") + '">' + (players[playerIndex].categories[9].fixed ? players[playerIndex].categories[9].score : "") + '</td>' +
+					tableCategoy(9) +
+					'<td class="number ' + (players[playerIndex].categories[9].fixed ? "fixed" : "") + ' ' + (turn == playerIndex ? "turn" : "") + ' ' + (players[playerIndex].categories[9].selectable ? "selectable" : "") + ' right-tborder">' + (players[playerIndex].categories[9].fixed ? players[playerIndex].categories[9].score : "") + '</td>' +
 				'</tr>' +
 				'<tr class="l-straight">' +
 					'<td class="category left-tborder">' +
 						'<img src="image/deco/lstraight.png"/>L. Straight' +
 					'</td>' +
-					'<td class="number ' + (players[0].categories[10].fixed ? "fixed" : "") + ' ' + (turn == 0 ? "turn" : "") + ' ' + (players[0].categories[10].selectable ? "selectable" : "") + '">' + (players[0].categories[10].fixed ? players[0].categories[10].score : "") + '</td>' +
-					'<td class="number ' + (players[1].categories[10].fixed ? "fixed" : "") + ' ' + (turn == 1 ? "turn" : "") + ' ' + (players[1].categories[10].selectable ? "selectable" : "") + '">' + (players[1].categories[10].fixed ? players[1].categories[10].score : "") + '</td>' +
-					'<td class="number ' + (players[2].categories[10].fixed ? "fixed" : "") + ' ' + (turn == 2 ? "turn" : "") + ' ' + (players[2].categories[10].selectable ? "selectable" : "") + ' right-tborder">' + (players[2].categories[10].fixed ? players[2].categories[10].score : "") + '</td>' +
+					'<td class="number ' + (players[resetplayerIndex()].categories[10].fixed ? "fixed" : "") + ' ' + (turn == playerIndex ? "turn" : "") + ' ' + (players[playerIndex].categories[10].selectable ? "selectable" : "") + '">' + (players[playerIndex].categories[10].fixed ? players[playerIndex].categories[10].score : "") + '</td>' +
+					tableCategoy(10) +
+					'<td class="number ' + (players[playerIndex].categories[10].fixed ? "fixed" : "") + ' ' + (turn == playerIndex ? "turn" : "") + ' ' + (players[playerIndex].categories[10].selectable ? "selectable" : "") + ' right-tborder">' + (players[playerIndex].categories[10].fixed ? players[playerIndex].categories[10].score : "") + '</td>' +
 				'</tr>' +
 				'<tr class="yacht">' +
 					'<td class="category left-tborder">' +
 						'<img src="image/deco/yacht.png"/>Yacht' +
 					'</td>' +
-					'<td class="number ' + (players[0].categories[11].fixed ? "fixed" : "") + ' ' + (turn == 0 ? "turn" : "") + ' ' + (players[0].categories[11].selectable ? "selectable" : "") + '">' + (players[0].categories[11].fixed ? players[0].categories[11].score : "") + '</td>' +
-					'<td class="number ' + (players[1].categories[11].fixed ? "fixed" : "") + ' ' + (turn == 1 ? "turn" : "") + ' ' + (players[1].categories[11].selectable ? "selectable" : "") + '">' + (players[1].categories[11].fixed ? players[1].categories[11].score : "") + '</td>' +
-					'<td class="number ' + (players[2].categories[11].fixed ? "fixed" : "") + ' ' + (turn == 2 ? "turn" : "") + ' ' + (players[2].categories[11].selectable ? "selectable" : "") + ' right-tborder">' + (players[2].categories[11].fixed ? players[2].categories[11].score : "") + '</td>' +
+					'<td class="number ' + (players[resetplayerIndex()].categories[11].fixed ? "fixed" : "") + ' ' + (turn == playerIndex ? "turn" : "") + ' ' + (players[playerIndex].categories[11].selectable ? "selectable" : "") + '">' + (players[playerIndex].categories[11].fixed ? players[playerIndex].categories[11].score : "") + '</td>' +
+					tableCategoy(11) +
+					'<td class="number ' + (players[playerIndex].categories[11].fixed ? "fixed" : "") + ' ' + (turn == playerIndex ? "turn" : "") + ' ' + (players[playerIndex].categories[11].selectable ? "selectable" : "") + ' right-tborder">' + (players[playerIndex].categories[11].fixed ? players[playerIndex].categories[11].score : "") + '</td>' +
 				'</tr>' +
 				
 				'<tr class="total">' +
 					'<td class="category bottom-tborder left-tborder">Total</td>' +
-					'<td class="number ' + (turn == 0 ? "turn" : "") + ' bottom-tborder">' + players[0].total + '</td>' +
-					'<td class="number ' + (turn == 1 ? "turn" : "") + ' bottom-tborder">' + players[1].total + '</td>' +
-					'<td class="number ' + (turn == 2 ? "turn" : "") + ' bottom-tborder right-tborder">' + players[2].total + '</td>' +
+					'<td class="number ' + (turn == resetplayerIndex() ? "turn" : "") + ' bottom-tborder">' + players[playerIndex].total + '</td>' +
+					tableTotal() +
+					'<td class="number ' + (turn == playerIndex ? "turn" : "") + ' bottom-tborder right-tborder">' + players[playerIndex].total + '</td>' +
 				'</tr>' +
 			'</table>';
 }

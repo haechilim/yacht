@@ -1,9 +1,11 @@
 var MAX_GAME_TURN = 12;
 var TOTAL_DICES = 5;
-var PLAYER_COUNT = 3;
+var PLAYER_COUNT = 2;
 
 var SDICES_POPUP_DELAY = 1000;
 var SDICES_ANIMATION_DELAY = 1000;
+
+var playerIndex = 0;
 
 var gameTurn = 1;
 var turn = 0;
@@ -16,172 +18,12 @@ var diceCounts = [0, 0, 0, 0, 0, 0];
 
 var soundTimer;
 
-var players = [
-	{
-		id: 1,
-		avatar: 1,
-		categories: [
-			{	
-				name: "aces",
-				fixed: false,
-				selectable: false,
-				score: 0
-			},
-			{	
-				name: "deuces",
-				fixed: false,
-				selectable: false,
-				score: 0
-			},
-			{	
-				name: "threes",
-				fixed: false,
-				selectable: false,
-				score: 0
-			},
-			{	
-				name: "fours",
-				fixed: false,
-				selectable: false,
-				score: 0
-			},
-			{	
-				name: "fives",
-				fixed: false,
-				selectable: false,
-				score: 0
-			},
-			{	
-				name: "sixes",
-				fixed: false,
-				selectable: false,
-				score: 0
-			},
-			{	
-				name: "choice",
-				fixed: false,
-				selectable: false,
-				score: 0
-			},
-			{	
-				name: "kind",
-				fixed: false,
-				selectable: false,
-				score: 0
-			},
-			{	
-				name: "full_house",
-				fixed: false,
-				selectable: false,
-				score: 0
-			},
-			{	
-				name: "S_straight",
-				fixed: false,
-				selectable: false,
-				score: 0
-			},
-			{	
-				name: "L_straight",
-				fixed: false,
-				selectable: false,
-				score: 0
-			},
-			{	
-				name: "yacht",
-				fixed: false,
-				selectable: false,
-				score: 0
-			},
-		],
-		subtotal: 0,
-		isBonus: false,
-		total: 0,
-	},
-	{
-		id: 2,
-		avatar: 3,
-		categories: [
-			{	
-				name: "aces",
-				fixed: false,
-				selectable: false,
-				score: 0
-			},
-			{	
-				name: "deuces",
-				fixed: false,
-				selectable: false,
-				score: 0
-			},
-			{	
-				name: "threes",
-				fixed: false,
-				selectable: false,
-				score: 0
-			},
-			{	
-				name: "fours",
-				fixed: false,
-				selectable: false,
-				score: 0
-			},
-			{	
-				name: "fives",
-				fixed: false,
-				selectable: false,
-				score: 0
-			},
-			{	
-				name: "sixes",
-				fixed: false,
-				selectable: false,
-				score: 0
-			},
-			{	
-				name: "choice",
-				fixed: false,
-				selectable: false,
-				score: 0
-			},
-			{	
-				name: "kind",
-				fixed: false,
-				selectable: false,
-				score: 0
-			},
-			{	
-				name: "full_house",
-				fixed: false,
-				selectable: false,
-				score: 0
-			},
-			{	
-				name: "S_straight",
-				fixed: false,
-				selectable: false,
-				score: 0
-			},
-			{	
-				name: "L_straight",
-				fixed: false,
-				selectable: false,
-				score: 0
-			},
-			{	
-				name: "yacht",
-				fixed: false,
-				selectable: false,
-				score: 0
-			},
-		],
-		subtotal: 0,
-		isBonus: false,
-		total: 0,
-	},
-	{
-		id: 3,
-		avatar: 6,
+var players = [];
+
+function player(id, avatar) {
+	return {
+		id: id,
+		avatar: avatar,
 		categories: [
 			{	
 				name: "aces",
@@ -260,9 +102,16 @@ var players = [
 		isBonus: false,
 		total: 0,
 	}
-];
+}
+
+function updatePlayers() {
+	for(var i = 0; i < PLAYER_COUNT; i++) {
+		players.push(player(i, i + 1));
+	}
+}
 
 function init() {
+	updatePlayers();
 	updateTable();
 	//initScoreBoard();
 	//highlightTurn();
