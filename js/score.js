@@ -270,7 +270,12 @@ function highlightTurn() {
 
 function updateSelectable(visible) {
 	for(var categoryIndex = 0; categoryIndex < players[turn].categories.length; categoryIndex++) {
-		players[turn].categories[categoryIndex].selectable = visible ? true : false;
+		if(players[turn].categories[categoryIndex].fixed) {
+			players[turn].categories[categoryIndex].selectable = false;
+			continue;
+		}
+		
+		players[turn].categories[categoryIndex].selectable = visible;
 	}
 }
 
