@@ -1,17 +1,77 @@
-function updateTable() {
+var ACES_INDEX = 0;
+var SIXES_INDEX = 5;
+var CHOICE_INDEX = 6;
+var YACHT_INDEX = 11;
+
+var categorieNames = [
+	"Aces", "Deuces", "Threes", "Fours", "Fives", "Sixes",
+	"Choice", "4 fo a kind", "Full House", "S. Straight", "L. Straight", "Yacht"
+];
+
+var categorieIcons = [
+	"dice1", "dice2", "dice3", "dice4", "dice5", "dice6",
+	"choice", "kind", "fullhouse", "sstraight", "lstraight", "yacht"
+];
+
+
+// ---------------------------------------------
+
+function updateScore(categoryName, value) {
+	var category = getCategory(players[turn], categoryName);
+	
+	if(category) {
+		category.fixed = true;
+		category.score = value;
+	}
+}
+
+function updateSubtotal() {
+	var player = players[turn];
+	var category = player.categories;
+	var subtotal = 0;
+	
+	for(var i = ACES_INDEX; i <= SIXES_INDEX; i++) {
+		if(!category[i].fixed) continue;
+		subtotal += category[i].score;
+	}
+	
+	player.subtotal = subtotal;
+	player.isBonus = player.subtotal >= 63;
+}
+
+function updateTotal() {
+	var player = players[turn];
+	var category = player.categories;
+	var total = player.isBonus ? 35 : 0;
+	
+	for(var i = 0; i < category.length; i++) {
+		if(!category[i].fixed) continue;
+		total += category[i].score;
+	}
+	
+	player.total = total;
+}
+
+// ---------------------------------------------
+
+function redrawGameTurn() {
+	document.querySelector(".progress").innerText = gameTurn + "/12";
+}
+
+function redrawTable() {
 	var html;
 	
-	html = header();
-	html += upper();
-	html += lower();
-	
+	html = headerHtml();
+	html += upperHtml();
+	html += subtotalHtml();
+	html += lowerHtml();
+	html += totalHtml();
 	document.querySelector("#score-container").innerHTML = html;
+	
 	bindScoreEvents();
 }
 
-function header() {
-	resetplayerIndex();
-	
+function headerHtml() {
 	return '<table class="score">' +
 				'<tr>' +
 					'<th class="turn bottom-tborder">' + 
@@ -19,297 +79,128 @@ function header() {
 						'<div class="progress">' + gameTurn + '/12</div>' +
 						'<div class="categories">Categories</div>' +
 					'</th>' +
-					'<th class="player top-tborder bottom-border left-tborder">' +
-						'<img src="image/avatar/avatar' + players[playerIndex++].avatar + '.png"/>' +
-					'</th>' +
-					tableHeader() +
-					'<th class="player top-tborder bottom-border left-border right-tborder">' +
-						'<img src="image/avatar/avatar' + players[playerIndex].avatar + '.png"/>' +
-					'</th>' +
+					playersHtml() +
 				'</tr>';
-}
-
-function tableHeader() {
-	var str = "";
-	
-	for(var i = playerIndex; i < PLAYER_COUNT - 1; i++) {
-		str +=  '<th class="player top-tborder bottom-border left-border">' +
-					'<img src="image/avatar/avatar' + players[playerIndex++].avatar + '.png"/>' +
-				'</th>';
-	}
-	
-	return str;
-}
-
-function tableCategoy(index) {
-	var str = "";
-	playerIndex++;
-	
-	for(var i = playerIndex; i < PLAYER_COUNT - 1; i++) {
-		str +=  '<td class="number ' + (players[playerIndex].categories[index].fixed ? "fixed" : "") + ' ' + (turn == playerIndex ? "turn" : "") + ' ' + (players[playerIndex].categories[index].selectable ? "selectable" : "") + '">' + (players[playerIndex].categories[index].fixed ? players[playerIndex].categories[index].score : "") + '</td>';
-		
-		playerIndex++;
-	}
-	
-	return str;
-}
-
-function tableSubtotal() {
-	var str = "";
-	
-	for(var i = playerIndex; i < PLAYER_COUNT - 1; i++) {
-		str +=  '<td class="number">' +
-					'<div class="subtotal">' + players[playerIndex].subtotal + '/63</div>' +
-					'<div class="bonus">' + (players[playerIndex++].isBonus ? "+35" : "+0") + '</div>' +
-				'</td>';
-	}
-	
-	return str;
-}
-
-function tableTotal() {
-	var str = "";
-	playerIndex++;
-	
-	for(var i = playerIndex; i < PLAYER_COUNT - 1; i++) {
-		str +=  '<td class="number ' + (turn == playerIndex ? "turn" : "") + ' bottom-tborder">' + players[playerIndex].total + '</td>';
-		
-		playerIndex++;
-	}
-	
-	return str;
-}
-
-function resetplayerIndex() {
-	playerIndex = 0;
-	
-	return playerIndex;
-}
- 
-function upper() {
-	return '<tr class="aces">' +
-					'<td class="category left-tborder">' +
-						'<img src="image/deco/dice1.png"/>Aces' +
-					'</td>' +
-					'<td class="number ' + (players[resetplayerIndex()].categories[0].fixed ? "fixed" : "") + ' ' + (turn == playerIndex ? "turn" : "") + ' ' + (players[playerIndex].categories[0].selectable ? "selectable" : "") + '">' + (players[playerIndex].categories[0].fixed ? players[playerIndex].categories[0].score : "") + '</td>' + 
-					tableCategoy(0) +
-					'<td class="number ' + (players[playerIndex].categories[0].fixed ? "fixed" : "") + ' ' + (turn == playerIndex ? "turn" : "") + ' ' + (players[playerIndex].categories[0].selectable ? "selectable" : "") + ' right-tborder">' + (players[playerIndex].categories[0].fixed ? players[playerIndex].categories[0].score : "") + '</td>' +
-				'</tr>' +
-				'<tr class="deuces">' +
-					'<td class="category left-tborder">' +
-						'<img src="image/deco/dice2.png"/>Deuces' +
-					'</td>' +
-					'<td class="number ' + (players[resetplayerIndex()].categories[1].fixed ? "fixed" : "") + ' ' + (turn == playerIndex ? "turn" : "") + ' ' + (players[playerIndex].categories[1].selectable ? "selectable" : "") + '">' + (players[playerIndex].categories[1].fixed ? players[playerIndex].categories[1].score : "") + '</td>' +
-					tableCategoy(1) +
-					'<td class="number ' + (players[playerIndex].categories[1].fixed ? "fixed" : "") + ' ' + (turn == playerIndex ? "turn" : "") + ' ' + (players[playerIndex].categories[1].selectable ? "selectable" : "") + ' right-tborder">' + (players[playerIndex].categories[1].fixed ? players[playerIndex].categories[1].score : "") + '</td>' +
-				'</tr>' +
-				'<tr class="threes">' +
-					'<td class="category left-tborder">' +
-						'<img src="image/deco/dice3.png"/>Threes' +
-					'</td>' +
-					'<td class="number ' + (players[resetplayerIndex()].categories[2].fixed ? "fixed" : "") + ' ' + (turn == playerIndex ? "turn" : "") + ' ' + (players[playerIndex].categories[2].selectable ? "selectable" : "") + '">' + (players[playerIndex].categories[2].fixed ? players[playerIndex].categories[2].score : "") + '</td>' +
-					tableCategoy(2) +
-					'<td class="number ' + (players[playerIndex].categories[2].fixed ? "fixed" : "") + ' ' + (turn == playerIndex ? "turn" : "") + ' ' + (players[playerIndex].categories[2].selectable ? "selectable" : "") + ' right-tborder">' + (players[playerIndex].categories[2].fixed ? players[playerIndex].categories[2].score : "") + '</td>' +
-				'</tr>' +
-				'<tr class="fours">' +
-					'<td class="category left-tborder">' +
-						'<img src="image/deco/dice4.png"/>Fours' +
-					'</td>' +
-					'<td class="number ' + (players[resetplayerIndex()].categories[3].fixed ? "fixed" : "") + ' ' + (turn == playerIndex ? "turn" : "") + ' ' + (players[playerIndex].categories[3].selectable ? "selectable" : "") + '">' + (players[playerIndex].categories[3].fixed ? players[playerIndex].categories[3].score : "") + '</td>' +
-					tableCategoy(3) +
-					'<td class="number ' + (players[playerIndex].categories[3].fixed ? "fixed" : "") + ' ' + (turn == playerIndex ? "turn" : "") + ' ' + (players[playerIndex].categories[3].selectable ? "selectable" : "") + ' right-tborder">' + (players[playerIndex].categories[3].fixed ? players[playerIndex].categories[3].score : "") + '</td>' +
-				'</tr>' +
-				'<tr class="fives">' +
-					'<td class="category left-tborder">' +
-						'<img src="image/deco/dice5.png"/>Fives' +
-					'</td>' +
-					'<td class="number ' + (players[resetplayerIndex()].categories[4].fixed ? "fixed" : "") + ' ' + (turn == playerIndex ? "turn" : "") + ' ' + (players[playerIndex].categories[4].selectable ? "selectable" : "") + '">' + (players[playerIndex].categories[4].fixed ? players[playerIndex].categories[4].score : "") + '</td>' +
-					tableCategoy(4) +
-					'<td class="number ' + (players[playerIndex].categories[4].fixed ? "fixed" : "") + ' ' + (turn == playerIndex ? "turn" : "") + ' ' + (players[playerIndex].categories[4].selectable ? "selectable" : "") + ' right-tborder">' + (players[playerIndex].categories[4].fixed ? players[playerIndex].categories[4].score : "") + '</td>' +
-				'</tr>' +
-				'<tr class="sixes">' +
-					'<td class="category left-tborder">' +
-						'<img src="image/deco/dice6.png"/>Sixes' +
-					'</td>' +
-					'<td class="number ' + (players[resetplayerIndex()].categories[5].fixed ? "fixed" : "") + ' ' + (turn == playerIndex ? "turn" : "") + ' ' + (players[playerIndex].categories[5].selectable ? "selectable" : "") + '">' + (players[playerIndex].categories[5].fixed ? players[playerIndex].categories[5].score : "") + '</td>' +
-					tableCategoy(5) +
-					'<td class="number ' + (players[playerIndex].categories[5].fixed ? "fixed" : "") + ' ' + (turn == playerIndex ? "turn" : "") + ' ' + (players[playerIndex].categories[5].selectable ? "selectable" : "") + ' right-tborder">' + (players[playerIndex].categories[5].fixed ? players[playerIndex].categories[5].score : "") + '</td>' +
-				'</tr>' +
 				
-				'<tr class="subtotal">' +
-					'<td class="category left-tborder">' +
-						'<div class="subtotal">Subtotal</div>' +
-						'<div class="bonus">+35 Bonus</div>' +
-					'</td>' +
-					'<td class="number">' +
-						'<div class="subtotal">' + players[resetplayerIndex()].subtotal + '/63</div>' +
-						'<div class="bonus">' + (players[playerIndex++].isBonus ? "+35" : "+0") + '</div>' +
-					'</td>' +
-					tableSubtotal() +
-					'<td class="number right-tborder">' +
-						'<div class="subtotal">' + players[playerIndex].subtotal + '/63</div>' +
-						'<div class="bonus">' + (players[playerIndex].isBonus ? "+35" : "+0") + '</div>' +
-					'</td>' +
-				'</tr>';
-}
-
-function lower() {
-	return '<tr class="choice">' +
-					'<td class="category left-tborder">' +
-						'<img src="image/deco/choice.png"/>Choice' +
-					'</td>' +
-					'<td class="number ' + (players[resetplayerIndex()].categories[6].fixed ? "fixed" : "") + ' ' + (turn == playerIndex ? "turn" : "") + ' ' + (players[playerIndex].categories[6].selectable ? "selectable" : "") + '">' + (players[playerIndex].categories[6].fixed ? players[playerIndex].categories[6].score : "") + '</td>' +
-					tableCategoy(6) +
-					'<td class="number ' + (players[playerIndex].categories[6].fixed ? "fixed" : "") + ' ' + (turn == playerIndex ? "turn" : "") + ' ' + (players[playerIndex].categories[6].selectable ? "selectable" : "") + ' right-tborder">' + (players[playerIndex].categories[6].fixed ? players[playerIndex].categories[6].score : "") + '</td>' +
-				'</tr>' +
-				'<tr class="kind">' +
-					'<td class="category left-tborder">' +
-						'<img src="image/deco/kind.png"/>4 of a kind' +
-					'</td>' +
-					'<td class="number ' + (players[resetplayerIndex()].categories[7].fixed ? "fixed" : "") + ' ' + (turn == playerIndex ? "turn" : "") + ' ' + (players[playerIndex].categories[7].selectable ? "selectable" : "") + '">' + (players[playerIndex].categories[7].fixed ? players[playerIndex].categories[7].score : "") + '</td>' +
-					tableCategoy(7) +
-					'<td class="number ' + (players[playerIndex].categories[7].fixed ? "fixed" : "") + ' ' + (turn == playerIndex ? "turn" : "") + ' ' + (players[playerIndex].categories[7].selectable ? "selectable" : "") + ' right-tborder">' + (players[playerIndex].categories[7].fixed ? players[playerIndex].categories[7].score : "") + '</td>' +
-				'</tr>' +
-				'<tr class="full-house">' +
-					'<td class="category left-tborder">' +
-						'<img src="image/deco/fullhouse.png"/>Full House' +
-					'</td>' +
-					'<td class="number ' + (players[resetplayerIndex()].categories[8].fixed ? "fixed" : "") + ' ' + (turn == playerIndex ? "turn" : "") + ' ' + (players[playerIndex].categories[8].selectable ? "selectable" : "") + '">' + (players[playerIndex].categories[8].fixed ? players[playerIndex].categories[8].score : "") + '</td>' +
-					tableCategoy(8) +
-					'<td class="number ' + (players[playerIndex].categories[8].fixed ? "fixed" : "") + ' ' + (turn == playerIndex ? "turn" : "") + ' ' + (players[playerIndex].categories[8].selectable ? "selectable" : "") + ' right-tborder">' + (players[playerIndex].categories[8].fixed ? players[playerIndex].categories[8].score : "") + '</td>' +
-				'</tr>' +
-				'<tr class="s-straight">' +
-					'<td class="category left-tborder">' +
-						'<img src="image/deco/sstraight.png"/>S. Straight' +
-					'</td>' +
-					'<td class="number ' + (players[resetplayerIndex()].categories[9].fixed ? "fixed" : "") + ' ' + (turn == playerIndex ? "turn" : "") + ' ' + (players[playerIndex].categories[9].selectable ? "selectable" : "") + '">' + (players[playerIndex].categories[9].fixed ? players[playerIndex].categories[9].score : "") + '</td>' +
-					tableCategoy(9) +
-					'<td class="number ' + (players[playerIndex].categories[9].fixed ? "fixed" : "") + ' ' + (turn == playerIndex ? "turn" : "") + ' ' + (players[playerIndex].categories[9].selectable ? "selectable" : "") + ' right-tborder">' + (players[playerIndex].categories[9].fixed ? players[playerIndex].categories[9].score : "") + '</td>' +
-				'</tr>' +
-				'<tr class="l-straight">' +
-					'<td class="category left-tborder">' +
-						'<img src="image/deco/lstraight.png"/>L. Straight' +
-					'</td>' +
-					'<td class="number ' + (players[resetplayerIndex()].categories[10].fixed ? "fixed" : "") + ' ' + (turn == playerIndex ? "turn" : "") + ' ' + (players[playerIndex].categories[10].selectable ? "selectable" : "") + '">' + (players[playerIndex].categories[10].fixed ? players[playerIndex].categories[10].score : "") + '</td>' +
-					tableCategoy(10) +
-					'<td class="number ' + (players[playerIndex].categories[10].fixed ? "fixed" : "") + ' ' + (turn == playerIndex ? "turn" : "") + ' ' + (players[playerIndex].categories[10].selectable ? "selectable" : "") + ' right-tborder">' + (players[playerIndex].categories[10].fixed ? players[playerIndex].categories[10].score : "") + '</td>' +
-				'</tr>' +
-				'<tr class="yacht">' +
-					'<td class="category left-tborder">' +
-						'<img src="image/deco/yacht.png"/>Yacht' +
-					'</td>' +
-					'<td class="number ' + (players[resetplayerIndex()].categories[11].fixed ? "fixed" : "") + ' ' + (turn == playerIndex ? "turn" : "") + ' ' + (players[playerIndex].categories[11].selectable ? "selectable" : "") + '">' + (players[playerIndex].categories[11].fixed ? players[playerIndex].categories[11].score : "") + '</td>' +
-					tableCategoy(11) +
-					'<td class="number ' + (players[playerIndex].categories[11].fixed ? "fixed" : "") + ' ' + (turn == playerIndex ? "turn" : "") + ' ' + (players[playerIndex].categories[11].selectable ? "selectable" : "") + ' right-tborder">' + (players[playerIndex].categories[11].fixed ? players[playerIndex].categories[11].score : "") + '</td>' +
-				'</tr>' +
-				
-				'<tr class="total">' +
-					'<td class="category bottom-tborder left-tborder">Total</td>' +
-					'<td class="number ' + (turn == resetplayerIndex() ? "turn" : "") + ' bottom-tborder">' + players[playerIndex].total + '</td>' +
-					tableTotal() +
-					'<td class="number ' + (turn == playerIndex ? "turn" : "") + ' bottom-tborder right-tborder">' + players[playerIndex].total + '</td>' +
-				'</tr>' +
-			'</table>';
-}
-
-// ---------------------------------------------
-
-var categories = [ 
-	"aces", "deuces", "threes", "fours", "fives", "sixes",
-	"choice", "kind", "full-house", "s-straight", "l-straight", "yacht",
-	"total"
-];
+	function playersHtml() {
+		var html = "";
 		
-function initScoreBoard() {
-	for(var i = 0; i < categories.length; i++) {
-		document.querySelectorAll(".score tr." + categories[i] + " td.number").forEach(function(element) {
-			element.classList.remove("fixed");
-			element.classList.remove("selectable");
-			element.innerText = "";
-		});
-	}
-}
-
-function updateGameTurn() {
-	document.querySelector(".progress").innerText = gameTurn + "/12";
-}
-
-/*function updateFixed() {
-	for(var playerIndex = 0; playerIndex < players.length; playerIndex++) {
-		var index = playerIndex + 2;
-		
-		for(var categoryIndex = 0; categoryIndex < players[playerIndex].categories.length; categoryIndex++) {
-			var category = players[playerIndex].categories[categoryIndex];
+		for(var index = 0; index < players.length; index++) {
+			var style = "player top-tborder bottom-border";
+			if(index == 0) style += " left-tborder";
+			if(index == players.length - 1) style += " right-tborder";
+			if(index > 0 && index < players.length) style += " left-border";
 			
-			if(category.fixed) document.querySelector(".score .number:nth-child(" + index + ")").classList.add("fixed");
-			
-			index += 3;
-		}
-	}
-}
-
-function updateTotalScore() {
-	var categories = players[turn].categories;
-	
-	for(var i = 0; i < categories.length; i++) {
-		if(categories[i].fixed) players[turn].total += categories[i].score;
-	}
-	
-	document.querySelector(".total td:nth-child(" + (turn + 2) + ")").innerText = players[turn].total;
-}
-
-function highlightTurn() {
-	document.querySelectorAll(".score td").forEach(function(element) {
-		element.classList.remove("turn");
-	});
-	
-	for(var i = 0; i < categories.length; i++) {
-		document.querySelector(".score tr." + categories[i] + " td:nth-child(" + (turn + 2) + ")").classList.add('turn');
-	}
-}*/
-
-function updateSelectable(visible) {
-	for(var categoryIndex = 0; categoryIndex < players[turn].categories.length; categoryIndex++) {
-		if(players[turn].categories[categoryIndex].fixed) {
-			players[turn].categories[categoryIndex].selectable = false;
-			continue;
+			html += '<th class="' + style + '">' +
+						'<img src="image/avatar/avatar' + players[index].avatar + '.png"/>' +
+					'</th>';
 		}
 		
-		players[turn].categories[categoryIndex].selectable = visible;
+		return html;
 	}
 }
 
-function updateScore(element) {
-	var category = document.querySelectorAll(".score .selectable");
+function upperHtml() {
+	return scoreHtml(ACES_INDEX, SIXES_INDEX);
+}
+
+function lowerHtml() {
+	return scoreHtml(CHOICE_INDEX, YACHT_INDEX);
+}
+
+function scoreHtml(startIndex, endIndex) {
+	var html = "";
 	
-	for(var index = 0; index < category.length; index++) {
-		if(element != category[index]) continue;
+	for(var cindex = startIndex; cindex <= endIndex; cindex++) {
+		var name;
 		
-		players[turn].categories[index].fixed = true;
-		players[turn].categories[index].score = parseInt(category[index].innerText);
+		html += '<tr class="' + categories[cindex] + '">' +
+					'<td class="category left-tborder">' +
+						'<img src="image/deco/' + getCategoryIcon(cindex) + '.png"/>' + getCategoryName(cindex) +
+					'</td>' +
+					playersHtml(cindex) +
+				'</tr>';
+	}
+	
+	return html;
+	
+	function playersHtml(cindex) {
+		var html = "";
+			
+		for(var pindex = 0; pindex < players.length; pindex++) {
+			var player = players[pindex];
+			var style = "number";
+			var value = player.categories[cindex].fixed ? player.categories[cindex].score : "";
+			
+			if(player.categories[cindex].fixed) style += " fixed";
+			if(player.categories[cindex].selectable) style += " selectable";
+			if(pindex == turn) style += " turn";
+			if(pindex == players.length - 1) style += " right-tborder";
+			
+			html += '<td class="' + style + '">' + value + '</td>';
+		}
+		
+		return html;
 	}
 }
 
-function updateTotal() {
-	players[turn].total = players[turn].isBonus ? 35 : 0;
-	
-	var category = players[turn].categories;
-	
-	for(var i = 0; i < category.length; i++) {
-		if(category[i].fixed) players[turn].total += category[i].score;
+function subtotalHtml() {
+	return '<tr class="subtotal">' +
+				'<td class="category left-tborder">' +
+					'<div class="subtotal">Subtotal</div>' +
+					'<div class="bonus">+35 Bonus</div>' +
+				'</td>' +
+				playersHtml() +
+			'</tr>';
+			
+	function playersHtml() {
+		var html = "";
+		
+		for(var pindex = 0; pindex < players.length; pindex++) {
+			var player = players[pindex];
+			var style = "number";
+			
+			if(pindex == players.length - 1) style += " right-tborder";
+			
+			html += '<td class="' + style + '">' +
+						'<div class="subtotal">' + player.subtotal + '/63</div>' +
+						'<div class="bonus">' + (player.isBonus ? "+35" : "+0") + '</div>' +
+					'</td>';
+		}
+		
+		return html;
 	}
 }
 
-function updateSubtotal() {
-	players[turn].subtotal = 0;
-	
-	var category = players[turn].categories;
-	
-	for(var i = 0; i < 6; i++) {
-		if(category[i].fixed) players[turn].subtotal += category[i].score;
+function totalHtml() {
+	return '<tr class="total">' +
+				'<td class="category bottom-tborder left-tborder">Total</td>' +
+				playersHtml() +
+			'</tr>';
+			
+	function playersHtml() {
+		var html = "";
+		
+		for(var pindex = 0; pindex < players.length; pindex++) {
+			var player = players[pindex];
+			var style = "number bottom-tborder";
+			
+			if(pindex == turn) style += " turn";
+			if(pindex == players.length - 1) style += " right-tborder";
+			
+			html += '<td class="' + style + '">' + player.total + '</td>';
+		}
+		
+		return html;
 	}
-	
-	players[turn].isBonus = players[turn].subtotal >= 63;
+}
+
+function getCategoryName(index) {
+	return (index >= 0 && index < categorieNames.length) ? categorieNames[index] : "";
+}
+
+function getCategoryIcon(index) {
+	return (index >= 0 && index < categorieIcons.length) ? categorieIcons[index] : "";
 }
 
 // ---------------------------------------------
@@ -353,15 +244,20 @@ function clearScores() {
 	}
 }
 
+// ---------------------------------------------
+
 function bindScoreEvents() {
 	document.querySelectorAll(".score .selectable").forEach(function(element) {
 		element.addEventListener('click', function() {
-			updateScore(element);
+			var category = this.parentElement.className;
+			var value = parseInt(this.innerText);
+			
+			updateScore(category, value);
 			updateSubtotal();
 			updateTotal();
 			showGuideNumber(false);
 			nextTurn();
-			updateTable();
+			redrawTable();
 		});
 	});
 }

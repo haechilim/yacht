@@ -120,22 +120,22 @@ function animateCup(oncomplete) {
 
 // ---------------------------------------------
 
-function updateChance() {
-	document.querySelector("#leftChance").innerText = leftChance;
-}
-
 function updateRollButtonVisibility() {
 	showRollButton(!(leftChance <= 0 || rollDices.length == 0));
 }
 
-function updateFloorDice(index, number, position) {
+function redrawChance() {
+	document.querySelector("#leftChance").innerText = leftChance;
+}
+
+function redrawFloorDice(index, number, position) {
 	var dice = document.querySelector(".rollDiceContainer .dice:nth-child(" + (index + 1) + ")");
 	dice.setAttribute( 'src', 'image/pdice' + number + '.png' );
 	dice.style.left = position.left + "px";
 	dice.style.top = position.top + "px";
 }
 
-function updateFloatDice(index, number, readyForAnimimation) {
+function redrawFloatDice(index, number, readyForAnimimation) {
 	var dice = document.querySelector(".selectDiceContainer .dice:nth-child(" + (index + 1) + ")");
 	dice.setAttribute('src', 'image/dice' + number + '.png');
 	dice.setAttribute('number', number);
@@ -144,11 +144,33 @@ function updateFloatDice(index, number, readyForAnimimation) {
 	if(readyForAnimimation) dice.classList.add("initial");
 }
 
-function updateKeepDice(index, number) {
+function redrawKeepDice(index, number) {
 	var dice = document.querySelector(".keepDiceContainer .dice:nth-child(" + (index + 1) + ")");
 	dice.setAttribute('src', 'image/dice' + number + '.png');
 	dice.setAttribute('number', number);
 	dice.setAttribute('index', index);
+}
+
+// ---------------------------------------------
+
+function redrawFloatDices(readyForAnimimation) {
+	showAllFloatDices(false);
+	
+	for(var index = 0; index < rollDices.length; index++) {
+		redrawFloatDice(index, rollDices[index], readyForAnimimation);
+		showFloatDice(index, true);
+	}
+}
+
+function redrawKeepDices() {
+	showAllKeepDices(false);
+	
+	for(var index = 0; index < keepDices.length; index++) {
+		if(keepDices[index] == 0) continue;
+		
+		redrawKeepDice(index, keepDices[index]);
+		showKeepDice(index, true);
+	}
 }
 
 // ---------------------------------------------

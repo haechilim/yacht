@@ -5,8 +5,6 @@ var PLAYER_COUNT = 2;
 var SDICES_POPUP_DELAY = 1000;
 var SDICES_ANIMATION_DELAY = 1000;
 
-var playerIndex = 0;
-
 var gameTurn = 1;
 var turn = 0;
 
@@ -20,101 +18,16 @@ var soundTimer;
 
 var players = [];
 
-function player(id, avatar) {
-	return {
-		id: id,
-		avatar: avatar,
-		categories: [
-			{	
-				name: "aces",
-				fixed: false,
-				selectable: false,
-				score: 0
-			},
-			{	
-				name: "deuces",
-				fixed: false,
-				selectable: false,
-				score: 0
-			},
-			{	
-				name: "threes",
-				fixed: false,
-				selectable: false,
-				score: 0
-			},
-			{	
-				name: "fours",
-				fixed: false,
-				selectable: false,
-				score: 0
-			},
-			{	
-				name: "fives",
-				fixed: false,
-				selectable: false,
-				score: 0
-			},
-			{	
-				name: "sixes",
-				fixed: false,
-				selectable: false,
-				score: 0
-			},
-			{	
-				name: "choice",
-				fixed: false,
-				selectable: false,
-				score: 0
-			},
-			{	
-				name: "kind",
-				fixed: false,
-				selectable: false,
-				score: 0
-			},
-			{	
-				name: "full_house",
-				fixed: false,
-				selectable: false,
-				score: 0
-			},
-			{	
-				name: "S_straight",
-				fixed: false,
-				selectable: false,
-				score: 0
-			},
-			{	
-				name: "L_straight",
-				fixed: false,
-				selectable: false,
-				score: 0
-			},
-			{	
-				name: "yacht",
-				fixed: false,
-				selectable: false,
-				score: 0
-			},
-		],
-		subtotal: 0,
-		isBonus: false,
-		total: 0,
-	}
-}
+var categories = [
+	"aces", "deuces", "threes", "fours", "fives", "sixes",
+	"choice", "kind", "full-house", "s-straight", "l-straight", "yacht",
+	"total"
+];
 
-function updatePlayers() {
-	for(var i = 0; i < PLAYER_COUNT; i++) {
-		players.push(player(i, i + 1));
-	}
-}
 
 function init() {
-	updatePlayers();
-	updateTable();
-	//initScoreBoard();
-	//highlightTurn();
+	initPlayers();
+	redrawTable();
 	showAllKeepDices(false);
 	showAllFloorDices(false);
 }
@@ -137,7 +50,7 @@ function rollWithAnimation() {
 				
 				setTimeout(function() {
 					updateSelectable(true);
-					updateTable();
+					redrawTable();
 					showGuideNumber(true);
 					updateRollButtonVisibility();
 					startDingSound();
@@ -163,7 +76,7 @@ function roll(oncomplete) {
 		rollDices[index] = number;
 		positions.push(position);
 		
-		updateFloorDice(index, number, position);
+		redrawFloorDice(index, number, position);
 		showFloorDice(index, true);
 	}
 	
@@ -271,9 +184,8 @@ function nextTurn() {
 	stopDingSound();
 	
 	if(increaseTurn()) {
-		updateGameTurn();
-		//highlightTurn();
-		
+		redrawGameTurn();
+	
 		resetChance();
 		showRollButton(true);
 		showAllFloatDices(false);
@@ -302,34 +214,12 @@ function increaseTurn() {
 
 function resetChance() {
 	leftChance = 3;
-	updateChance(leftChance);
+	redrawChance(leftChance);
 }
 	
 function decreaseChance() {
 	leftChance--;
-	updateChance(leftChance);
-}
-
-// ---------------------------------------------
-
-function redrawFloatDices(readyForAnimimation) {
-	showAllFloatDices(false);
-	
-	for(var index = 0; index < rollDices.length; index++) {
-		updateFloatDice(index, rollDices[index], readyForAnimimation);
-		showFloatDice(index, true);
-	}
-}
-
-function redrawKeepDices() {
-	showAllKeepDices(false);
-	
-	for(var index = 0; index < keepDices.length; index++) {
-		if(keepDices[index] == 0) continue;
-		
-		updateKeepDice(index, keepDices[index]);
-		showKeepDice(index, true);
-	}
+	redrawChance(leftChance);
 }
 
 // ---------------------------------------------
@@ -449,7 +339,7 @@ document.addEventListener("DOMContentLoaded", function() {
 function bindEvents() {
 	document.querySelector("#roll").addEventListener('click', function() {
 		updateSelectable(false);
-		updateTable();
+		redrawTable();
 		rollWithAnimation();
 	});
 	
