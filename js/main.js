@@ -338,9 +338,21 @@ document.addEventListener("DOMContentLoaded", function() {
 
 function bindEvents() {
 	document.querySelector("#roll").addEventListener('click', function() {
-		updateSelectable(false);
+		var xhr = new XMLHttpRequest();
+		
+		xhr.addEventListener("load", function() {
+			var data = JSON.parse(xhr.responseText);
+			console.log(data);
+		});
+		
+		xhr.open("GET", "/roll", true);
+		xhr.send();
+		
+		// 서버에 요청하기 (XMLHttpRequest)
+		
+		/*updateSelectable(false);
 		redrawTable();
-		rollWithAnimation();
+		rollWithAnimation();*/
 	});
 	
 	document.querySelectorAll(".selectDiceContainer .dice").forEach(function(element) {
