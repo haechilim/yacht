@@ -13,14 +13,14 @@ var server = http.createServer(function(request, response) {
 	}
 	else {
 		fs.readFile(str, function(error, data) {
-			console.log(error);
 			content(data);
 		});
 	}
 	
 	function content(data) {
 		response.writeHead(200, {
-			"content-type": getContentType(str) + (isText(str) ? "; charset=utf-8" : "")
+			"content-type": getContentType(str) + (isText(str) ? "; charset=utf-8" : ""),
+			"cache-control": isText(str) ? "no-cache" : "max-age=31536000"
 		});
 			
 		response.end(data);
