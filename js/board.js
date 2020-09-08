@@ -45,7 +45,7 @@ function determinePositions() {
 	sDiceSize.width = SDICE_WIDTH * ratio;
 	sDiceSize.height = SDICE_HEIGHT * ratio;
 	
-	for(var i = 0; i< TOTAL_DICES; i++) {
+	for(var i = 0; i < data.totalDices; i++) {
 		var position = {};
 		
 		position.left = KDICE_LEFTS[i] * ratio;
@@ -71,7 +71,7 @@ function resize() {
 	cup.style.height = (window.innerHeight / 2) + "px";
 	score.style.lineHeight = window.innerHeight / SCORE_LINE_HEIGHT_RATIO + "px";
 	
-	for(var i = 0; i < TOTAL_DICES; i++) {
+	for(var i = 0; i < data.totalDices; i++) {
 		var index = i + 1;
 		var dice = document.querySelector(".keepDiceContainer .dice:nth-child(" + index + ")");
 		var pdice = document.querySelector(".rollDiceContainer .dice:nth-child(" + index + ")");	
@@ -176,19 +176,19 @@ function redrawKeepDices() {
 // ---------------------------------------------
 
 function showAllKeepDices(visible) {
-	for(var i = 0; i < TOTAL_DICES; i++) {
+	for(var i = 0; i < data.totalDices; i++) {
 		showKeepDice(i, visible);
 	}
 }
 
 function showAllFloorDices(visible) {
-	for(var i = 0; i < TOTAL_DICES; i++) {
+	for(var i = 0; i < data.totalDices; i++) {
 		showFloorDice(i, visible);
 	}
 }
 
 function showAllFloatDices(visible) {
-	for(var i = 0; i < TOTAL_DICES; i++) {
+	for(var i = 0; i < data.totalDices; i++) {
 		showFloatDice(i, visible);
 	}
 }

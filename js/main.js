@@ -1,22 +1,7 @@
-var MAX_GAME_TURN = 12;
-var TOTAL_DICES = 5;
-var PLAYER_COUNT = 2;
-
 var SDICES_POPUP_DELAY = 1000;
 var SDICES_ANIMATION_DELAY = 1000;
 
-var gameTurn = 1;
-var turn = 0;
-
-var leftChance = 3;
-var rollDices = [0, 0, 0, 0, 0];
-var keepDices = [0, 0, 0, 0, 0];
-var resultDices = [];
-var diceCounts = [0, 0, 0, 0, 0, 0];
-
 var soundTimer;
-
-var players = [];
 
 var categories = [
 	"aces", "deuces", "threes", "fours", "fives", "sixes",
@@ -24,12 +9,28 @@ var categories = [
 	"total"
 ];
 
+var data;
 
 function init() {
-	initPlayers();
-	redrawTable();
-	showAllKeepDices(false);
-	showAllFloorDices(false);
+	var xhr = new XMLHttpRequest();
+		
+	xhr.addEventListener("load", function() {
+		data = JSON.parse(xhr.responseText);
+		console.log(data);
+		
+		redrawTable();
+		showAllKeepDices(false);
+		showAllFloorDices(false);
+		
+		determinePositions();
+		resize();
+		bindEvents();
+	});
+	
+	xhr.open("GET", "/data", true);
+	xhr.send();
+	
+	//initPlayers();
 }
 
 // ---------------------------------------------
@@ -200,12 +201,12 @@ function nextTurn() {
 function increaseTurn() {
 	turn++;
 	
-	if(turn >= PLAYER_COUNT) {
+	if(turn >= data.players.length) {
 		gameTurn++;
 		if(gameTurn > MAX_GAME_TURN) return false;
 	}
 	
-	turn %= PLAYER_COUNT;
+	turn %= data.players.length;
 	
 	return true;
 }
@@ -331,24 +332,12 @@ function playSound(filename) {
 
 document.addEventListener("DOMContentLoaded", function() {
 	init();
-	determinePositions();
-	resize();
-	bindEvents();
 });
 
 function bindEvents() {
 	document.querySelector("#roll").addEventListener('click', function() {
-		var xhr = new XMLHttpRequest();
 		
-		xhr.addEventListener("load", function() {
-			var data = JSON.parse(xhr.responseText);
-			console.log(data);
-		});
 		
-		xhr.open("GET", "/roll", true);
-		xhr.send();
-		
-		// 서버에 요청하기 (XMLHttpRequest)
 		
 		/*updateSelectable(false);
 		redrawTable();

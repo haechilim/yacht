@@ -2,28 +2,76 @@ var http = require("http");
 var fs = require("fs");
 var mime = require("mime");
 
+var MAX_GAME_TURN = 12;
+var TOTAL_DICES = 5;
+var PLAYER_COUNT = 3;
+
+var gamedata = {
+	totalDices: TOTAL_DICES,
+	maxGameTurn: MAX_GAME_TURN,
+	gameTurn: 1,
+	turn: 0,
+	leftChance: 3,
+	rollDices: [0, 0, 0, 0, 0],
+	keepDices: [0, 0, 0, 0, 0],
+	resultDices: [],
+	diceCounts: [0, 0, 0, 0, 0, 0],
+	players: []
+};
+
+var categories = [
+	"aces", "deuces", "threes", "fours", "fives", "sixes",
+	"choice", "kind", "full-house", "s-straight", "l-straight", "yacht",
+	"total"
+];
+
+function initPlayers() {
+	gamedata.players.length = 0;
+	
+	for(var i = 0; i < PLAYER_COUNT; i++) {
+		gamedata.players.push(newPlayer(i, i + 1));
+	}
+}
+
+function newPlayer(id, avatar) {
+	var result = {
+		id: id,
+		avatar: avatar,
+		isBonus: false,
+		subtotal: 0,
+		total: 0,
+		categories: []
+	};
+	
+	for(var i = 0; i < categories.length; i++) {
+		result.categories.push({
+			name: categories[i],
+			fixed: false,
+			selectable: false,
+			score: 0
+		});
+	}
+	
+	return result;
+}
+
 var server = http.createServer(function(request, response) {
 	console.log("요청 URL: ", request.url);
 	
 	var filepath = getfilepath(request.url);
 	var contentType = mime.getType(filepath);
+
 	
 	//console.log(contentType + " " + isText(contentType));
 	
-	if(request.url == "/roll") {
-		var test = {
-			a: 1,
-			b: false,
-			c: 123
-		};
-		
+	if(request.url == "/data") {
 		response.writeHead(200, {
 			"content-type": "application/json; charset=utf-8",
 			"cache-control": "no-cache"
 		});
 			
-		console.log(JSON.stringify(test));
-		response.end(JSON.stringify(test));
+		initPlayers();
+		response.end(JSON.stringify(gamedata));
 		return;
 	}
 		

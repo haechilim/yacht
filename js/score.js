@@ -76,7 +76,7 @@ function headerHtml() {
 				'<tr>' +
 					'<th class="turn bottom-tborder">' + 
 						'<div class="turn">Turn</div>' +
-						'<div class="progress">' + gameTurn + '/12</div>' +
+						'<div class="progress">' + data.gameTurn + '/12</div>' +
 						'<div class="categories">Categories</div>' +
 					'</th>' +
 					playersHtml() +
@@ -85,14 +85,14 @@ function headerHtml() {
 	function playersHtml() {
 		var html = "";
 		
-		for(var index = 0; index < players.length; index++) {
+		for(var index = 0; index < data.players.length; index++) {
 			var style = "player top-tborder bottom-border";
 			if(index == 0) style += " left-tborder";
-			if(index == players.length - 1) style += " right-tborder";
-			if(index > 0 && index < players.length) style += " left-border";
+			if(index == data.players.length - 1) style += " right-tborder";
+			if(index > 0 && index < data.players.length) style += " left-border";
 			
 			html += '<th class="' + style + '">' +
-						'<img src="image/avatar/avatar' + players[index].avatar + '.png"/>' +
+						'<img src="image/avatar/avatar' + data.players[index].avatar + '.png"/>' +
 					'</th>';
 		}
 		
@@ -127,15 +127,15 @@ function scoreHtml(startIndex, endIndex) {
 	function playersHtml(cindex) {
 		var html = "";
 			
-		for(var pindex = 0; pindex < players.length; pindex++) {
-			var player = players[pindex];
+		for(var pindex = 0; pindex < data.players.length; pindex++) {
+			var player = data.players[pindex];
 			var style = "number";
 			var value = player.categories[cindex].fixed ? player.categories[cindex].score : "";
 			
 			if(player.categories[cindex].fixed) style += " fixed";
 			if(player.categories[cindex].selectable) style += " selectable";
-			if(pindex == turn) style += " turn";
-			if(pindex == players.length - 1) style += " right-tborder";
+			if(pindex == data.turn) style += " turn";
+			if(pindex == data.players.length - 1) style += " right-tborder";
 			
 			html += '<td class="' + style + '">' + value + '</td>';
 		}
@@ -156,11 +156,11 @@ function subtotalHtml() {
 	function playersHtml() {
 		var html = "";
 		
-		for(var pindex = 0; pindex < players.length; pindex++) {
-			var player = players[pindex];
+		for(var pindex = 0; pindex < data.players.length; pindex++) {
+			var player = data.players[pindex];
 			var style = "number";
 			
-			if(pindex == players.length - 1) style += " right-tborder";
+			if(pindex == data.players.length - 1) style += " right-tborder";
 			
 			html += '<td class="' + style + '">' +
 						'<div class="subtotal">' + player.subtotal + '/63</div>' +
@@ -181,12 +181,12 @@ function totalHtml() {
 	function playersHtml() {
 		var html = "";
 		
-		for(var pindex = 0; pindex < players.length; pindex++) {
-			var player = players[pindex];
+		for(var pindex = 0; pindex < data.players.length; pindex++) {
+			var player = data.players[pindex];
 			var style = "number bottom-tborder";
 			
-			if(pindex == turn) style += " turn";
-			if(pindex == players.length - 1) style += " right-tborder";
+			if(pindex == data.turn) style += " turn";
+			if(pindex == data.players.length - 1) style += " right-tborder";
 			
 			html += '<td class="' + style + '">' + player.total + '</td>';
 		}
