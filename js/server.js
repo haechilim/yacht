@@ -4,7 +4,6 @@ var mime = require("mime");
 
 var MAX_GAME_TURN = 12;
 var TOTAL_DICES = 5;
-var PLAYER_COUNT = 3;
 
 var gamedata = {
 	totalDices: TOTAL_DICES,
@@ -25,12 +24,7 @@ var categories = [
 	"total"
 ];
 
-function initPlayers() {
-	gamedata.players.length = 0;
-	
-	for(var i = 0; i < PLAYER_COUNT; i++) {
-		gamedata.players.push(newPlayer(i, i + 1));
-	}
+function init() {
 }
 
 function newPlayer(id, avatar) {
@@ -58,7 +52,8 @@ function newPlayer(id, avatar) {
 var server = http.createServer(function(request, response) {
 	console.log("요청 URL: ", request.url);
 	
-	var filepath = getfilepath(request.url);
+	var urlPath = getUrlPath(request.url);
+	var filepath = getFilePath(urlPath);
 	var contentType = mime.getType(filepath);
 
 	
@@ -70,7 +65,6 @@ var server = http.createServer(function(request, response) {
 			"cache-control": "no-cache"
 		});
 			
-		initPlayers();
 		response.end(JSON.stringify(gamedata));
 		return;
 	}
@@ -105,14 +99,20 @@ var server = http.createServer(function(request, response) {
 	}
 });
 
-server.listen(8888);
+init();
 
+server.listen(8888);
 console.log("나 듣고 있다!");
 
-function getfilepath(request) {
-	if(request == "/") return "yacht.html";
+function getUrlPath(url) {
+	var index = url.indexOf("?");
+	return index < 0 ? url : url.substr(0, index);
+}
+
+function getFilePath(urlPath) {
+	if(urlPath == "/") return "yacht.html";
 	
-	return request.substr(1, request.length - 1);
+	return urlPath.substr(1, urlPath.length - 1);
 }
 
 function isText(contentType) {

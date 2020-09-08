@@ -12,11 +12,10 @@ var categories = [
 var data;
 
 function init() {
-	var xhr = new XMLHttpRequest();
+	requestData(function(json) {
+		data = json;
 		
-	xhr.addEventListener("load", function() {
-		data = JSON.parse(xhr.responseText);
-		console.log(data);
+		console.log(json);
 		
 		redrawTable();
 		showAllKeepDices(false);
@@ -26,11 +25,20 @@ function init() {
 		resize();
 		bindEvents();
 	});
+}
+
+// ---------------------------------------------
+
+function requestData(callback) {
+	var xhr = new XMLHttpRequest();
+		
+	xhr.addEventListener("load", function() {
+		var json = JSON.parse(xhr.responseText);
+		if(callback) callback(json);
+	});
 	
 	xhr.open("GET", "/data", true);
 	xhr.send();
-	
-	//initPlayers();
 }
 
 // ---------------------------------------------
