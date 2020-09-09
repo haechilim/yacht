@@ -2,6 +2,8 @@ var SDICES_POPUP_DELAY = 1000;
 var SDICES_ANIMATION_DELAY = 1000;
 
 var soundTimer;
+var myId;
+var data;
 
 var categories = [
 	"aces", "deuces", "threes", "fours", "fives", "sixes",
@@ -9,24 +11,26 @@ var categories = [
 	"total"
 ];
 
-var data;
-
 function init() {
-	requestJoin();
-	
-	requestData(function(json) {
-		data = json;
+	requestJoin(function(json) {
+		myId = json.id;
+		console.log(myId);
 		
-		console.log(json);
-		
-		redrawTable();
-		showAllKeepDices(false);
-		showAllFloorDices(false);
-		
-		determinePositions();
-		resize();
-		bindEvents();
-	});
+		requestData(function(json) {
+			data = json;
+			
+			console.log(json);
+			
+			redrawTable();
+			updateRollButtonVisibility();
+			showAllKeepDices(false);
+			showAllFloorDices(false);
+			
+			determinePositions();
+			resize();
+			bindEvents();
+		});
+	});	
 }
 
 // ---------------------------------------------

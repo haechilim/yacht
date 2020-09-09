@@ -121,7 +121,7 @@ function animateCup(oncomplete) {
 // ---------------------------------------------
 
 function updateRollButtonVisibility() {
-	showRollButton(!(leftChance <= 0 || rollDices.length == 0));
+	showRollButton(!(leftChance <= 0 || data.rollDices.length == 0 || data.players[data.turn].id != myId));
 }
 
 function redrawChance() {
