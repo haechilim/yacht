@@ -133,7 +133,7 @@ var server = http.createServer(function(request, response) {
 	function content(error, data) {
 		if(error) {
 			response.writeHead(404, {
-				"content-type": contentType + (isText(contentType) ? "; charset=utf-8" : "")
+				"content-type": "text/plain; charset=utf-8"
 			});
 				
 			response.end("그런 파일 없다!");
