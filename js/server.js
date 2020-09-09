@@ -27,6 +27,25 @@ var categories = [
 function init() {
 }
 
+function join(requestUrl) {
+	var JOIN_SUCCESS = 0;
+	var JOIN_NO_ID = 1;
+	var JOIN_ALREADY_EXISTS = 2;
+	
+	var code = JOIN_SUCCESS;
+	var parameters = getUrlParameters(requestUrl);
+	
+	if(!parameters.id) code = JOIN_NO_ID;
+	else {
+		if(playerExists(parameters.id)) code = JOIN_ALREADY_EXISTS;
+		else gamedata.players.push(newPlayer(parameters.id, 1));
+	}
+	
+	return {
+		code: code
+	};
+}
+
 function newPlayer(id, avatar) {
 	var result = {
 		id: id,
@@ -49,36 +68,39 @@ function newPlayer(id, avatar) {
 	return result;
 }
 
+function playerExists(id) {
+	for(var i = 0; i < gamedata.players.length; i++) {
+		if(gamedata.players[i].id == id) return true;
+	}
+	
+	return false;
+}
+
+init();
+
+// ---------------------------------------------
+
 var server = http.createServer(function(request, response) {
 	console.log("요청 URL: ", request.url);
 	
 	var urlPath = getUrlPath(request.url);
 	var filepath = getFilePath(urlPath);
 	var contentType = mime.getType(filepath);
-
 	
 	//console.log(contentType + " " + isText(contentType));
 	
-	if(request.url == "/data") {
-		response.writeHead(200, {
-			"content-type": "application/json; charset=utf-8",
-			"cache-control": "no-cache"
-		});
+	switch(urlPath) {
+		case "/join":
+			jsonResponse(response, join(request.url));
+			return;
 			
-		response.end(JSON.stringify(gamedata));
-		return;
+		case "/data":
+			jsonResponse(response, gamedata);
+			return;
 	}
 		
-	if(isText(contentType))	{
-		fs.readFile(filepath, "utf-8", function(error, data) {
-			content(error, data);
-		});
-	}
-	else {
-		fs.readFile(filepath, function(error, data) {
-			content(error, data);
-		});
-	}
+	if(isText(contentType))	fs.readFile(filepath, "utf-8", content);
+	else fs.readFile(filepath, content);
 	
 	function content(error, data) {
 		if(error) {
@@ -99,15 +121,51 @@ var server = http.createServer(function(request, response) {
 	}
 });
 
-init();
-
 server.listen(8888);
 console.log("나 듣고 있다!");
+
+// ---------------------------------------------
+
+function jsonResponse(response, data) {
+	response.writeHead(200, {
+		"content-type": "application/json; charset=utf-8",
+		"cache-control": "no-cache"
+	});
+		
+	response.end(JSON.stringify(data));
+}
 
 function getUrlPath(url) {
 	var index = url.indexOf("?");
 	return index < 0 ? url : url.substr(0, index);
 }
+
+function getUrlParameters(url) {
+	var result = {};
+	var part = parameterPart();
+	var parameters = part.split("&");
+	
+	for(var i = 0; i < parameters.length; i++) {
+		var tokens = parameters[i].split("=");
+		
+		if(tokens.length < 2) continue;
+		
+		result[tokens[0]] = tokens[1];
+	}
+	
+	return result;
+	
+	
+	function parameterPart() {
+		/*
+			/page?a=ddd&x=12342&y=333 -> a=ddd&x=12342&y=333
+		*/
+		var tokens = url.split("?");
+		return tokens.length > 1 ? tokens[1] : "";
+	}
+}
+	
+	
 
 function getFilePath(urlPath) {
 	if(urlPath == "/") return "yacht.html";

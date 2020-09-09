@@ -12,6 +12,8 @@ var categories = [
 var data;
 
 function init() {
+	requestJoin();
+	
 	requestData(function(json) {
 		data = json;
 		
@@ -29,7 +31,15 @@ function init() {
 
 // ---------------------------------------------
 
+function requestJoin(callback) {
+	request("/join" + location.search, callback);
+}
+
 function requestData(callback) {
+	request("/data", callback);
+}
+
+function request(url, callback) {
 	var xhr = new XMLHttpRequest();
 		
 	xhr.addEventListener("load", function() {
@@ -37,7 +47,7 @@ function requestData(callback) {
 		if(callback) callback(json);
 	});
 	
-	xhr.open("GET", "/data", true);
+	xhr.open("GET", url, true);
 	xhr.send();
 }
 
