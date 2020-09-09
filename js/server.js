@@ -4,6 +4,7 @@ var mime = require("mime");
 
 var MAX_GAME_TURN = 12;
 var TOTAL_DICES = 5;
+var TOTAL_AVATAR = 13;
 
 var gamedata = {
 	totalDices: TOTAL_DICES,
@@ -34,11 +35,12 @@ function join(requestUrl) {
 	
 	var code = JOIN_SUCCESS;
 	var parameters = getUrlParameters(requestUrl);
+	var avatar = makeValidAvatar(parameters.avatar);
 	
 	if(!parameters.id) code = JOIN_NO_ID;
 	else {
 		if(playerExists(parameters.id)) code = JOIN_ALREADY_EXISTS;
-		else gamedata.players.push(newPlayer(parameters.id, 1));
+		else gamedata.players.push(newPlayer(parameters.id, avatar));
 	}
 	
 	return {
@@ -68,11 +70,37 @@ function newPlayer(id, avatar) {
 	return result;
 }
 
+function makeValidAvatar(avatar) {
+	return (!avatar || avatar < 1 || avatar > TOTAL_AVATAR) ? randomAvatar() : avatar;
+}
+
+function randomAvatar() {
+	var usableAvatars = [];
+	
+	for(var index = 1; index <= TOTAL_AVATAR; index++) {
+		if(!avatarExists(index)) usableAvatars.push(index);
+	}
+	
+	if(usableAvatars.length > 0) {
+		return usableAvatars[Math.floor(Math.random() * usableAvatars.length)];
+	}
+	
+	return 1;
+}
+
 function playerExists(id) {
 	for(var i = 0; i < gamedata.players.length; i++) {
 		if(gamedata.players[i].id == id) return true;
 	}
 	
+	return false;
+}
+
+function avatarExists(avatar) {
+	for(var i = 0; i < gamedata.players.length; i++) {
+		if(gamedata.players[i].avatar == avatar) return true;
+	}
+
 	return false;
 }
 
