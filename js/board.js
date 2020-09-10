@@ -92,6 +92,14 @@ function resize() {
 
 // ---------------------------------------------
 
+function redrawBoard() {
+	redrawFloatDices(false);
+	redrawKeepDices();
+	redrawChance();
+}
+
+// ---------------------------------------------
+
 function animateFloatDices() {
 	setTimeout(function() {
 		document.querySelectorAll(".selectDiceContainer .dice").forEach(function(element) {
@@ -121,11 +129,11 @@ function animateCup(oncomplete) {
 // ---------------------------------------------
 
 function updateRollButtonVisibility() {
-	showRollButton(!(leftChance <= 0 || data.rollDices.length == 0 || data.players[data.turn].id != myId));
+	showRollButton(!(leftChance <= 0 || data.rollDices.length == 0 || !isMyTurn));
 }
 
 function redrawChance() {
-	document.querySelector("#leftChance").innerText = leftChance;
+	document.querySelector("#leftChance").innerText = data.leftChance;
 }
 
 function redrawFloorDice(index, number, position) {
@@ -141,7 +149,7 @@ function redrawFloatDice(index, number, readyForAnimimation) {
 	dice.setAttribute('number', number);
 	dice.setAttribute('index', index);
 
-	if(readyForAnimimation) dice.classList.add("initial");
+	readyForAnimimation ? dice.classList.add("initial") : dice.classList.remove("initial");
 }
 
 function redrawKeepDice(index, number) {
@@ -156,8 +164,10 @@ function redrawKeepDice(index, number) {
 function redrawFloatDices(readyForAnimimation) {
 	showAllFloatDices(false);
 	
-	for(var index = 0; index < rollDices.length; index++) {
-		redrawFloatDice(index, rollDices[index], readyForAnimimation);
+	for(var index = 0; index < data.rollDices.length; index++) {
+		if(data.rollDices[index] == 0) continue;
+		
+		redrawFloatDice(index, data.rollDices[index], readyForAnimimation);
 		showFloatDice(index, true);
 	}
 }
@@ -165,10 +175,10 @@ function redrawFloatDices(readyForAnimimation) {
 function redrawKeepDices() {
 	showAllKeepDices(false);
 	
-	for(var index = 0; index < keepDices.length; index++) {
-		if(keepDices[index] == 0) continue;
+	for(var index = 0; index < data.keepDices.length; index++) {
+		if(data.keepDices[index] == 0) continue;
 		
-		redrawKeepDice(index, keepDices[index]);
+		redrawKeepDice(index, data.keepDices[index]);
 		showKeepDice(index, true);
 	}
 }

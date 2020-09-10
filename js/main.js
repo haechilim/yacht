@@ -1,8 +1,14 @@
 var SDICES_POPUP_DELAY = 1000;
 var SDICES_ANIMATION_DELAY = 1000;
 
+var SUCCESS = 0;
+var NOT_YOUR_TURN = 1;
+
 var soundTimer;
 var myId;
+var isMyTurn;
+var sequence = 0;
+
 var data;
 
 var categories = [
@@ -14,22 +20,32 @@ var categories = [
 function init() {
 	requestJoin(function(json) {
 		myId = json.id;
-		console.log(myId);
+		console.log(json);
 		
-		requestData(function(json) {
-			data = json;
-			
-			console.log(json);
-			
-			redrawTable();
-			updateRollButtonVisibility();
-			showAllKeepDices(false);
-			showAllFloorDices(false);
-			
-			determinePositions();
-			resize();
-			bindEvents();
-		});
+		var timer = setInterval(function() {
+			requestData(function(json) {
+				data = json;
+				if(sequence >= data.sequence) return;
+				sequence = data.sequence;
+				
+				isMyTurn = data.players[data.turn].id == myId;
+				
+				console.log(json);
+					
+				redrawTable();
+				redrawBoard();
+				console.log("그렸어");
+				updateRollButtonVisibility();
+				//showAllKeepDices(false);
+				showAllFloorDices(false);
+				
+				determinePositions();
+				resize();
+				bindEvents();
+				
+				//if(isMyTurn) clearInterval(timer);
+			});
+		}, 1000);
 	});	
 }
 
@@ -37,6 +53,10 @@ function init() {
 
 function requestJoin(callback) {
 	request("/join" + location.search, callback);
+}
+
+function requestRoll(callback) {
+	request("/roll?id=" + myId, callback);
 }
 
 function requestData(callback) {
@@ -89,31 +109,21 @@ function roll(oncomplete) {
 	var positions = [];
 	
 	showCup(false);
-	showAllFloorDices(false);
 	showAllFloatDices(false);
 
-	for(var index = 0; index < rollDices.length; index++) {
-		var number = randomNumber();
+	for(var index = 0; index < data.rollDices.length; index++) {
 		var position = randomPosition();
-		
-		rollDices[index] = number;
 		positions.push(position);
 		
-		redrawFloorDice(index, number, position);
+		redrawFloorDice(index, data.rollDices[index], position);
 		showFloorDice(index, true);
 	}
 	
-	rollDices.sort();
 	updateResultDices();
 	calculateDiceCounts();
 	playThrowSound();
 	
 	if(oncomplete) oncomplete();
-	
-
-	function randomNumber() {
-		return Math.floor(Math.random() * 6 + 1);
-	}
 	
 	function randomPosition() {
 		var MAX_RETRY_COUNT = 100;
@@ -151,22 +161,22 @@ function roll(oncomplete) {
 	}
 	
 	function updateResultDices() {
-		resultDices = rollDices.concat([]);
+		data.resultDices = data.rollDices.concat([]);
 		
-		keepDices.forEach(function(number) {
-			if(number > 0) resultDices.push(number);
+		data.keepDices.forEach(function(number) {
+			if(number > 0) data.resultDices.push(number);
 		});
 		
-		resultDices.sort();
+		data.resultDices.sort();
 	}
 }
 
 // ---------------------------------------------
 
 function keepDice(number, index) {
-	if(index < 0 || index >= rollDices.length) return;
+	if(index < 0 || index >= data.rollDices.length) return;
 	
-	rollDices.splice(index, 1);
+	data.rollDices.splice(index, 1);
 	fillAtEmptySlot(number);
 	
 	playKeepSound();
@@ -175,9 +185,9 @@ function keepDice(number, index) {
 	updateRollButtonVisibility();
 	
 	function fillAtEmptySlot(number) {
-		for(var i = 0; i < keepDices.length; i++) {
-			if(keepDices[i] == 0) {
-				keepDices[i] = number;
+		for(var i = 0; i < data.keepDices.length; i++) {
+			if(data.keepDices[i] == 0) {
+				data.keepDices[i] = number;
 				break;
 			}
 		}
@@ -256,8 +266,8 @@ function getDiceDotCount(number) {
 function getChoiceScore() {
 	var sum = 0;
 	
-	for(var i = 0; i < resultDices.length; i++) {
-		sum += resultDices[i];
+	for(var i = 0; i < data.resultDices.length; i++) {
+		sum += data.resultDices[i];
 	}
 	
 	return sum;
@@ -316,9 +326,9 @@ function checkStraight(large) {
 function calculateDiceCounts() {
 	diceCounts = [0, 0, 0, 0, 0, 0];
 	
-	for(var i = 0; i < resultDices.length; i++) {
-		var index = resultDices[i] - 1;
-		diceCounts[index]++;
+	for(var i = 0; i < data.resultDices.length; i++) {
+		var index = data.resultDices[i] - 1;
+		data.diceCounts[index]++;
 	}
 }
 
@@ -358,9 +368,15 @@ document.addEventListener("DOMContentLoaded", function() {
 
 function bindEvents() {
 	document.querySelector("#roll").addEventListener('click', function() {
-		
-		
-		
+		requestRoll(function(json) {
+			if(json.id == SUCCESS) {
+				requestData(function(json) {
+					console.log(json);
+				});
+			}
+			
+			rollWithAnimation();
+		});
 		/*updateSelectable(false);
 		redrawTable();
 		rollWithAnimation();*/

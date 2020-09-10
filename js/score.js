@@ -210,7 +210,7 @@ function showGuideNumber(visible) {
 }
 
 function markScores() {
-	var playerCategory = turn + 2;
+	var playerCategory = data.turn + 2;
 	var result = [
 		getDiceDotCount(1), 
 		getDiceDotCount(2), 
@@ -227,7 +227,7 @@ function markScores() {
 	];
 	
 	for(var i = 0; i < categories.length; i++) {
-		var category = document.querySelector(".score tr." + categories[i] + " td:nth-child(" + (turn + 2) + ")");
+		var category = document.querySelector(".score tr." + categories[i] + " td:nth-child(" + (data.turn + 2) + ")");
 		
 		if(result[i] === undefined || category.classList.contains("fixed")) continue;
 		

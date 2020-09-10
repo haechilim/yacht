@@ -6,6 +6,9 @@ var MAX_GAME_TURN = 12;
 var TOTAL_DICES = 5;
 var TOTAL_AVATAR = 13;
 
+var NORMAL = 0;
+var ROLL = 1;
+
 var gamedata = {
 	totalDices: TOTAL_DICES,
 	maxGameTurn: MAX_GAME_TURN,
@@ -14,10 +17,13 @@ var gamedata = {
 	leftChance: 3,
 	rollDices: [0, 0, 0, 0, 0],
 	keepDices: [0, 0, 0, 0, 0],
-	resultDices: [],
-	diceCounts: [0, 0, 0, 0, 0, 0],
-	players: []
+	players: [],
+	status: NORMAL,
+	sequence: 1
 };
+
+var resultDices: [];
+var diceCounts: [0, 0, 0, 0, 0, 0];
 
 var categories = [
 	"aces", "deuces", "threes", "fours", "fives", "sixes",
@@ -26,6 +32,7 @@ var categories = [
 ];
 
 function init() {
+	
 }
 
 function join(requestUrl) {
@@ -40,7 +47,10 @@ function join(requestUrl) {
 	if(!parameters.id) code = JOIN_NO_ID;
 	else {
 		if(playerExists(parameters.id)) code = JOIN_ALREADY_EXISTS;
-		else gamedata.players.push(newPlayer(parameters.id, avatar));
+		else {
+			gamedata.players.push(newPlayer(parameters.id, avatar));
+			gamedata.sequence++;
+		}
 	}
 	
 	return {
@@ -89,6 +99,32 @@ function randomAvatar() {
 	return 1;
 }
 
+function randomDices(parameter) {
+	var SUCCESS = 0;
+	var NOT_YOUR_TURN = 1;
+	var code = NOT_YOUR_TURN;
+	
+	if(isYourYurn(parameter)) {
+		code = SUCCESS;
+		
+		for(var i = 0; i < TOTAL_DICES; i++) {
+			var random = randomNumber();
+			
+			gamedata.rollDices[i] = random;
+			gamedata.resultDices[i] = random;
+			//gamedata.diceCounts[random - 1]++;
+		}
+		
+		gamedata.rollDices.sort();
+		gamedata.resultDices.sort();
+		gamedata.sequence++;
+	}
+	
+	return {
+		code: code
+	}
+}
+
 function playerExists(id) {
 	for(var i = 0; i < gamedata.players.length; i++) {
 		if(gamedata.players[i].id == id) return true;
@@ -125,6 +161,13 @@ var server = http.createServer(function(request, response) {
 			
 		case "/data":
 			jsonResponse(response, gamedata);
+			return;
+			
+		case "/roll":
+			var parameter = getUrlParameters(request.url);
+			gamedata.status = ROLL;
+			
+			jsonResponse(response, randomDices(parameter));
 			return;
 	}
 		
@@ -193,8 +236,6 @@ function getUrlParameters(url) {
 		return tokens.length > 1 ? tokens[1] : "";
 	}
 }
-	
-	
 
 function getFilePath(urlPath) {
 	if(urlPath == "/") return "yacht.html";
@@ -202,6 +243,14 @@ function getFilePath(urlPath) {
 	return urlPath.substr(1, urlPath.length - 1);
 }
 
+function isYourYurn(parameter) {
+	return gamedata.players[gamedata.turn].id == parameter.id;
+}
+
 function isText(contentType) {
 	return contentType == "text/html" || contentType == "text/css" || contentType == "application/javascript";
+}
+
+function randomNumber() {
+	return Math.floor(Math.random() * 6 + 1);
 }

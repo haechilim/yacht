@@ -1,5 +1,5 @@
 function updateSelectable(selectable) {
-	var categories = players[turn].categories;
+	var categories = data.players[data.turn].categories;
 	
 	categories.forEach(function(category) {
 		category.selectable = category.fixed ? false : selectable;
