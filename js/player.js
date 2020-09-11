@@ -1,11 +1,3 @@
-function updateSelectable(selectable) {
-	var categories = data.players[data.turn].categories;
-	
-	categories.forEach(function(category) {
-		category.selectable = category.fixed ? false : selectable;
-	});
-}
-
 function getCategory(player, category) {
 	var categories = player.categories;
 	

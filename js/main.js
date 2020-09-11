@@ -2,6 +2,8 @@ var SDICES_POPUP_DELAY = 1000;
 var SDICES_ANIMATION_DELAY = 1000;
 
 var soundTimer;
+var isGuideNumber = false; 
+var isSelectable = false; 
 var myId;
 var isMyTurn;
 var sequence = 0;
@@ -32,14 +34,18 @@ function init() {
 				console.log("그렸어");
 				console.log(json);
 					
+				updateSelectable(isSelectable);
+				isSelectable = false;
+				
 				redrawTable();
 				redrawBoard();
-				//showAllKeepDices(false);
+				
+				showGuideNumber(isGuideNumber);
+				isGuideNumber = false;
 				showAllFloorDices(false);
 				
 				determinePositions();
 				resize();
-				bindEvents();
 				
 				//if(isMyTurn) clearInterval(timer);
 			});
@@ -99,8 +105,6 @@ function rollWithAnimation() {
 			}, SDICES_POPUP_DELAY);
 		});
 	});
-	
-	decreaseChance();
 }
 
 function roll(oncomplete) {
@@ -110,6 +114,11 @@ function roll(oncomplete) {
 	showAllFloatDices(false);
 
 	for(var index = 0; index < data.rollDices.length; index++) {
+		if(data.rollDices[index] == 0) {
+			showFloorDice(index, false);
+			continue;
+		}
+		
 		var position = randomPosition();
 		positions.push(position);
 		
@@ -285,6 +294,7 @@ function playSound(filename) {
 
 document.addEventListener("DOMContentLoaded", function() {
 	init();
+	bindEvents();
 });
 
 function bindEvents() {
@@ -298,9 +308,19 @@ function bindEvents() {
 	
 	document.querySelectorAll(".selectDiceContainer .dice").forEach(function(element) {
 		element.addEventListener('click', function() {
-			var number = parseInt(this.getAttribute("number"));
 			var index = parseInt(this.getAttribute("index"));
-			keepDice(number, index);
+			
+			requestKeepDice(function(json) {
+				isGuideNumber = true;
+				isSelectable = true;
+			});
+			
+			/*var number = parseInt(this.getAttribute("number"));
+			var index = parseInt(this.getAttribute("index"));
+			keepDice(number, index);*/
+			function requestKeepDice(callback) {
+				request("/keep?id=" + myId + "&index=" + index, callback);
+			}
 		});
 	});
 	

@@ -205,6 +205,14 @@ function getCategoryIcon(index) {
 
 // ---------------------------------------------
 
+function updateSelectable(selectable) {
+	var categories = data.players[data.turn].categories;
+	
+	categories.forEach(function(category) {
+		category.selectable = category.fixed ? false : selectable;
+	});
+}
+
 function showGuideNumber(visible) {
 	visible ? markScores() : clearScores();
 }
@@ -279,8 +287,8 @@ function getLSrtaightScore() {
 }
 
 function getYachtScore() {
-	for(var i = 0; i < diceCounts.length; i++) {
-		if(diceCounts[i] == 5) return 50;
+	for(var i = 0; i < data.diceCounts.length; i++) {
+		if(data.diceCounts[i] == 5) return 50;
 	}
 	
 	return 0;
@@ -311,8 +319,8 @@ function calculateDiceCounts() {
 }
 
 function clearScores() {
-	for(var i = 0; i < categories.length; i++) {
-		var element = document.querySelector(".score tr." + categories[i] + " td:nth-child(" + (turn + 2) + ")");
+	for(var i = 0; i < categories.length - 1; i++) {
+		var element = document.querySelector(".score tr." + categories[i] + " td:nth-child(" + (data.turn + 2) + ")");
 		
 		if(element.classList.contains("fixed")) continue;
 		element.innerText = "";

@@ -6,6 +6,10 @@ var MAX_GAME_TURN = 12;
 var TOTAL_DICES = 5;
 var TOTAL_AVATAR = 13;
 
+var SUCCESS = 0;
+var NOT_YOUR_TURN = 1;
+var code = NOT_YOUR_TURN;
+
 var NORMAL = 0;
 var ROLL = 1;
 
@@ -99,16 +103,23 @@ function randomAvatar() {
 }
 
 function randomDices(parameter) {
-	var SUCCESS = 0;
-	var NOT_YOUR_TURN = 1;
-	var code = NOT_YOUR_TURN;
+	code = NOT_YOUR_TURN;
 	
 	if(isYourTurn(parameter)) {
 		code = SUCCESS;
 		gamedata.status = ROLL;
 		gamedata.diceCounts = [0, 0, 0, 0, 0, 0];
+		gamedata.rollDices = [0, 0, 0, 0, 0];
+		gamedata.leftChance--;
+		gamedata.sequence++;
 		
-		for(var i = 0; i < TOTAL_DICES; i++) {
+		for(var i = 0; i < gamedata.keepDices.length; i++) {
+			if(gamedata.keepDices[i] != 0) {
+				gamedata.diceCounts[gamedata.keepDices[i] - 1]++;
+				gamedata.resultDices[i] = gamedata.keepDices[i];
+				continue;
+			}
+			
 			var random = randomNumber();
 			
 			gamedata.rollDices[i] = random;
@@ -116,9 +127,33 @@ function randomDices(parameter) {
 			gamedata.diceCounts[random - 1]++;
 		}
 		
+		console.log(gamedata.rollDices);
 		gamedata.rollDices.sort();
 		gamedata.resultDices.sort();
+	}
+	
+	return {
+		code: code
+	}
+}
+
+function keepDice(parameter) {
+	code = NOT_YOUR_TURN;
+	
+	if(isYourTurn(parameter)) {
+		code = SUCCESS;
+		gamedata.status = NORMAL;
 		gamedata.sequence++;
+		
+		var index = parameter.index;
+		
+		for(var i = 0; i < gamedata.keepDices.length; i++) {
+			if(gamedata.keepDices[i] == 0) {
+				gamedata.keepDices[i] = gamedata.rollDices[index];
+				gamedata.rollDices[index] = 0;
+				break;
+			}
+		}
 	}
 	
 	return {
@@ -168,6 +203,12 @@ var server = http.createServer(function(request, response) {
 			var parameter = getUrlParameters(request.url);
 			
 			jsonResponse(response, randomDices(parameter));
+			return;
+			
+		case "/keep":
+			var parameter = getUrlParameters(request.url);
+			
+			jsonResponse(response, keepDice(parameter));
 			return;
 	}
 		

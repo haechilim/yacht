@@ -97,7 +97,9 @@ function resize() {
 
 function redrawBoard() {
 	redrawFloatDices(false);
+	
 	if(data.status == ROLL) rollWithAnimation();
+	
 	redrawKeepDices();
 	redrawChance();
 }
@@ -133,7 +135,17 @@ function animateCup(oncomplete) {
 // ---------------------------------------------
 
 function updateRollButtonVisibility() {
-	showRollButton(!(leftChance <= 0 || data.rollDices.length == 0 || !isMyTurn));
+	showRollButton(data.leftChance > 0 && (validRollDiceCount() != 0 || isMyTurn));
+}
+
+function validRollDiceCount() {
+	var count = 0;
+	
+	for(var i = 0; i < data.rollDices.length; i++) {
+		if(data.rollDices[i] != 0) count++;
+	}
+	
+	return count;
 }
 
 function redrawChance() {
