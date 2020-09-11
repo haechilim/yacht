@@ -335,14 +335,22 @@ function bindScoreEvents() {
 	document.querySelectorAll(".score .selectable").forEach(function(element) {
 		element.addEventListener('click', function() {
 			var category = this.parentElement.className;
-			var value = parseInt(this.innerText);
+			
+			requestSelectScore(function(json) {
+			});
+			
+			function requestSelectScore(callback) {
+				request("/score?id=" + myId + "&category=" + category, callback);
+			}
+			
+			/*var value = parseInt(this.innerText);
 			
 			updateScore(category, value);
 			updateSubtotal();
 			updateTotal();
 			showGuideNumber(false);
 			nextTurn();
-			redrawTable();
+			redrawTable();*/
 		});
 	});
 }

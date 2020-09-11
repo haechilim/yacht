@@ -31,20 +31,18 @@ var gamedata = {
 var categories = [
 	"aces", "deuces", "threes", "fours", "fives", "sixes",
 	"choice", "kind", "full-house", "s-straight", "l-straight", "yacht",
-	"total"
 ];
 
 function init() {
 	
 }
 
-function join(requestUrl) {
+function join(parameters) {
 	var JOIN_SUCCESS = 0;
 	var JOIN_NO_ID = 1;
 	var JOIN_ALREADY_EXISTS = 2;
 	
 	var code = JOIN_SUCCESS;
-	var parameters = getUrlParameters(requestUrl);
 	var avatar = makeValidAvatar(parameters.avatar);
 	
 	if(!parameters.id) code = JOIN_NO_ID;
@@ -76,7 +74,6 @@ function newPlayer(id, avatar) {
 		result.categories.push({
 			name: categories[i],
 			fixed: false,
-			selectable: false,
 			score: 0
 		});
 	}
@@ -161,6 +158,31 @@ function keepDice(parameter) {
 	}
 }
 
+function unkeepDice(parameter) {
+	code = NOT_YOUR_TURN;
+	
+	if(isYourTurn(parameter)) {
+		code = SUCCESS;
+		gamedata.status = NORMAL;
+		gamedata.sequence++;
+		
+		var index = parameter.index;
+		
+		for(var i = 0; i < gamedata.rollDices.length; i++) {
+			if(gamedata.rollDices[i] == 0) {
+				gamedata.rollDices[i] = gamedata.keepDices[index];
+				gamedata.keepDices[index] = 0;
+				gamedata.rollDices.sort();
+				break;
+			}
+		}
+	}
+	
+	return {
+		code: code
+	}
+}
+
 function playerExists(id) {
 	for(var i = 0; i < gamedata.players.length; i++) {
 		if(gamedata.players[i].id == id) return true;
@@ -187,28 +209,33 @@ var server = http.createServer(function(request, response) {
 	var urlPath = getUrlPath(request.url);
 	var filepath = getFilePath(urlPath);
 	var contentType = mime.getType(filepath);
+	var parameter = getUrlParameters(request.url);
 	
 	//console.log(contentType + " " + isText(contentType));
 	
 	switch(urlPath) {
-		case "/join":
-			jsonResponse(response, join(request.url));
-			return;
-			
 		case "/data":
 			jsonResponse(response, gamedata);
 			return;
 			
-		case "/roll":
-			var parameter = getUrlParameters(request.url);
+		case "/join":
+			jsonResponse(response, join(parameter));
+			return;
 			
+		case "/roll":
 			jsonResponse(response, randomDices(parameter));
 			return;
 			
 		case "/keep":
-			var parameter = getUrlParameters(request.url);
-			
 			jsonResponse(response, keepDice(parameter));
+			return;
+			
+		case "/unkeep":
+			jsonResponse(response, unkeepDice(parameter));
+			return;
+			
+		case "/score":
+			jsonResponse(response, score(parameter));
 			return;
 	}
 		
@@ -236,6 +263,129 @@ var server = http.createServer(function(request, response) {
 
 server.listen(8888);
 console.log("나 듣고 있다!");
+
+// ---------------------------------------------
+
+function score(parameter) {
+	code = NOT_YOUR_TURN;
+	
+	if(isYourTurn(parameter)) {
+		var category = parameter.category;
+		gamedata.sequence++;
+	
+		var result = [
+			getDiceDotCount(1), 
+			getDiceDotCount(2), 
+			getDiceDotCount(3), 
+			getDiceDotCount(4), 
+			getDiceDotCount(5), 
+			getDiceDotCount(6),
+			getChoiceScore(), 
+			get4OfKindScore(), 
+			getFullHouseScore(), 
+			getSSrtaightScore(), 
+			getLSrtaightScore(),
+			getYachtScore()
+		];
+		
+		for(var i = 0; i < categories.length; i++) {
+			if(categories[i] != category) continue;
+			
+			var player = gamedata.players[gamedata.turn];
+			
+			if(i < 6) {
+				player.subtotal += result[i];
+				if(!player.isBonus && player.subtotal >= 63) {
+					player.isBonus = true;
+					player.total += 35;
+				}
+			}
+			
+			player.categories[i].fixed = true;
+			player.categories[i].score = result[i];
+			player.total += result[i];
+		}
+	}
+	
+	return {
+		code: code
+	}
+}
+
+function increaseTurn() {
+	gamedata.turn++;
+	
+	if(gamedata.turn >= gamedata.players.length) {
+		gamedata.turn %= gamedata.players.length;
+		gamedata.gameTurn++;
+	}
+}
+
+function getDiceDotCount(number) {
+	var index = number - 1;
+	if(index < 0 || index >= gamedata.diceCounts.length) return 0;
+	return gamedata.diceCounts[index] * number;
+}
+
+function getChoiceScore() {
+	var sum = 0;
+	
+	for(var i = 0; i < gamedata.resultDices.length; i++) {
+		sum += gamedata.resultDices[i];
+	}
+	
+	return sum;
+}
+
+function get4OfKindScore() {
+	for(var i = 0; i < gamedata.diceCounts.length; i++) {
+		if(gamedata.diceCounts[i] == 4) return getChoiceScore();
+	}
+	
+	return 0;
+}
+
+function getFullHouseScore() {
+	var pair, triple;
+	
+	for(var i = 0; i < gamedata.diceCounts.length; i++) {
+		if(gamedata.diceCounts[i] == 2) pair = true;
+		else if(gamedata.diceCounts[i] == 3) triple = true;
+	}
+	
+	return (pair && triple) ? getChoiceScore() : 0;
+}
+
+function getSSrtaightScore() {
+	return checkStraight(false) ? 15 : 0;
+}
+
+function getLSrtaightScore() {
+	return checkStraight(true) ? 30 : 0;
+}
+
+function getYachtScore() {
+	for(var i = 0; i < gamedata.diceCounts.length; i++) {
+		if(gamedata.diceCounts[i] == 5) return 50;
+	}
+	
+	return 0;
+}
+
+function checkStraight(large) {
+	var count = 0;
+	var number = large ? 5 : 4;
+	
+	for(var i = 0; i < gamedata.diceCounts.length; i++) {
+		if(gamedata.diceCounts[i] == 0) count = 0;
+		else {
+			count++;
+			if(count == number) return true;
+		}
+	}
+	
+	return false;
+}
 
 // ---------------------------------------------
 

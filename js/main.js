@@ -315,9 +315,6 @@ function bindEvents() {
 				isSelectable = true;
 			});
 			
-			/*var number = parseInt(this.getAttribute("number"));
-			var index = parseInt(this.getAttribute("index"));
-			keepDice(number, index);*/
 			function requestKeepDice(callback) {
 				request("/keep?id=" + myId + "&index=" + index, callback);
 			}
@@ -326,9 +323,16 @@ function bindEvents() {
 	
 	document.querySelectorAll(".keepDiceContainer .dice").forEach(function(element) {
 		element.addEventListener('click', function() {
-			var number = parseInt(this.getAttribute("number"));
 			var index = parseInt(this.getAttribute("index"));
-			unkeepDice(number, index);
+			
+			requestUnkeepDice(function(json) {
+				isGuideNumber = true;
+				isSelectable = true;
+			});
+			
+			function requestUnkeepDice(callback) {
+				request("/unkeep?id=" + myId + "&index=" + index, callback);
+			}
 		});
 	});	
 	
