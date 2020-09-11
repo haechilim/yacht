@@ -135,7 +135,9 @@ function animateCup(oncomplete) {
 // ---------------------------------------------
 
 function updateRollButtonVisibility() {
-	showRollButton(data.leftChance > 0 && (validRollDiceCount() != 0 || isMyTurn));
+	if(!isMyTurn) showRollButton(false);
+	else if(data.leftChance == 3) showRollButton(true); 
+	else showRollButton(data.leftChance > 0 && validRollDiceCount() != 0); 
 }
 
 function validRollDiceCount() {

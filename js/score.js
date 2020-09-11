@@ -206,6 +206,8 @@ function getCategoryIcon(index) {
 // ---------------------------------------------
 
 function updateSelectable(selectable) {
+	if(!isMyTurn) return;
+	
 	var categories = data.players[data.turn].categories;
 	
 	categories.forEach(function(category) {
