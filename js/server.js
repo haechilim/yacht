@@ -124,7 +124,6 @@ function randomDices(parameter) {
 			gamedata.diceCounts[random - 1]++;
 		}
 		
-		console.log(gamedata.rollDices);
 		gamedata.rollDices.sort();
 		gamedata.resultDices.sort();
 	}
@@ -211,8 +210,6 @@ var server = http.createServer(function(request, response) {
 	var contentType = mime.getType(filepath);
 	var parameter = getUrlParameters(request.url);
 	
-	//console.log(contentType + " " + isText(contentType));
-	
 	switch(urlPath) {
 		case "/data":
 			jsonResponse(response, gamedata);
@@ -262,7 +259,7 @@ var server = http.createServer(function(request, response) {
 });
 
 server.listen(8888);
-console.log("나 듣고 있다!");
+console.log("서버 on");
 
 // ---------------------------------------------
 
@@ -272,6 +269,7 @@ function score(parameter) {
 	if(isYourTurn(parameter)) {
 		var category = parameter.category;
 		gamedata.sequence++;
+		gamedata.status = NORMAL;
 	
 		var result = [
 			getDiceDotCount(1), 
@@ -304,6 +302,8 @@ function score(parameter) {
 			player.categories[i].fixed = true;
 			player.categories[i].score = result[i];
 			player.total += result[i];
+			
+			increaseTurn();
 		}
 	}
 	
@@ -319,6 +319,12 @@ function increaseTurn() {
 		gamedata.turn %= gamedata.players.length;
 		gamedata.gameTurn++;
 	}
+	
+	gamedata.leftChance = 3;
+	gamedata.rollDices = [0, 0, 0, 0, 0];
+	gamedata.keepDices = [0, 0, 0, 0, 0];
+	gamedata.resultDices = [];
+	gamedata.diceCounts = [0, 0, 0, 0, 0, 0];
 }
 
 function getDiceDotCount(number) {
