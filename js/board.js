@@ -24,6 +24,7 @@ var CUP_SHAKING_INTERVAL = 100;
 
 var NORMAL = 0;
 var ROLL = 1;
+var KEEP = 2;
 
 var center = {};
 var floorPosition = {};
@@ -99,6 +100,10 @@ function redrawBoard() {
 	redrawFloatDices(false);
 	
 	if(data.status == ROLL) rollWithAnimation();
+	else if(data.status == KEEP) {
+		playKeepSound();
+		isGuideNumber = true;
+	}
 	
 	redrawKeepDices();
 	redrawChance();

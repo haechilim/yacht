@@ -12,6 +12,7 @@ var code = NOT_YOUR_TURN;
 
 var NORMAL = 0;
 var ROLL = 1;
+var KEEP = 2;
 
 var gamedata = {
 	totalDices: TOTAL_DICES,
@@ -138,7 +139,7 @@ function keepDice(parameter) {
 	
 	if(isYourTurn(parameter)) {
 		code = SUCCESS;
-		gamedata.status = NORMAL;
+		gamedata.status = KEEP;
 		gamedata.sequence++;
 		
 		var index = parameter.index;
@@ -162,7 +163,7 @@ function unkeepDice(parameter) {
 	
 	if(isYourTurn(parameter)) {
 		code = SUCCESS;
-		gamedata.status = NORMAL;
+		gamedata.status = KEEP;
 		gamedata.sequence++;
 		
 		var index = parameter.index;

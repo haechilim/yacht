@@ -337,6 +337,8 @@ function bindScoreEvents() {
 			var category = this.parentElement.className;
 			
 			requestSelectScore(function(json) {
+				requestGameData();
+				stopDingSound();
 			});
 			
 			function requestSelectScore(callback) {

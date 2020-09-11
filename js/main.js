@@ -22,35 +22,38 @@ function init() {
 		console.log(json);
 		
 		var timer = setInterval(function() {
-			requestData(function(json) {
-				data = json;
-				
-				if(sequence >= data.sequence) return;
-				sequence = data.sequence;
-				isMyTurn = data.players[data.turn].id == myId;
-				
-				updateRollButtonVisibility();
-				
-				console.log("그렸어");
-				console.log(json);
-					
-				updateSelectable(isSelectable);
-				isSelectable = false;
-				
-				redrawTable();
-				redrawBoard();
-				
-				showGuideNumber(isGuideNumber);
-				isGuideNumber = false;
-				showAllFloorDices(false);
-				
-				determinePositions();
-				resize();
-				
-				//if(isMyTurn) clearInterval(timer);
-			});
+			requestGameData()
 		}, 1000);
 	});	
+}
+
+function requestGameData() {
+	requestData(function(json) {
+		data = json;
+		
+		if(sequence >= data.sequence) return;
+		
+		sequence = data.sequence;
+		isMyTurn = data.players[data.turn].id == myId;
+		
+		setCursor();
+		updateRollButtonVisibility();
+		updateSelectable(isSelectable);
+		isSelectable = false;
+		redrawTable();
+		redrawBoard();
+		showGuideNumber(isGuideNumber);
+		isGuideNumber = false;
+		showAllFloorDices(false);
+		determinePositions();
+		resize();
+	});
+	
+	function setCursor() {
+		document.querySelectorAll(".dice").forEach(function(element) {
+			element.style.cursor = isMyTurn ? "pointer" : "default";
+		});
+	}
 }
 
 // ---------------------------------------------
@@ -100,7 +103,7 @@ function rollWithAnimation() {
 					redrawTable();
 					showGuideNumber(true);
 					updateRollButtonVisibility();
-					startDingSound();
+					if(isMyTurn) startDingSound();
 				}, SDICES_ANIMATION_DELAY);
 			}, SDICES_POPUP_DELAY);
 		});
@@ -300,17 +303,18 @@ document.addEventListener("DOMContentLoaded", function() {
 function bindEvents() {
 	document.querySelector("#roll").addEventListener('click', function() {
 		requestRoll(function(json) {
+			requestGameData();
 		});
-		/*updateSelectable(false);
-		redrawTable();
-		rollWithAnimation();*/
 	});
 	
 	document.querySelectorAll(".selectDiceContainer .dice").forEach(function(element) {
 		element.addEventListener('click', function() {
+			if(!isMyTurn) return;
+			
 			var index = parseInt(this.getAttribute("index"));
 			
 			requestKeepDice(function(json) {
+				requestGameData();
 				isGuideNumber = true;
 				isSelectable = true;
 			});
@@ -323,9 +327,12 @@ function bindEvents() {
 	
 	document.querySelectorAll(".keepDiceContainer .dice").forEach(function(element) {
 		element.addEventListener('click', function() {
+			if(!isMyTurn) return;
+			
 			var index = parseInt(this.getAttribute("index"));
 			
 			requestUnkeepDice(function(json) {
+				requestGameData();
 				isGuideNumber = true;
 				isSelectable = true;
 			});
