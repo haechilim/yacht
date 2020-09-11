@@ -17,13 +17,12 @@ var gamedata = {
 	leftChance: 3,
 	rollDices: [0, 0, 0, 0, 0],
 	keepDices: [0, 0, 0, 0, 0],
+	resultDices: [],
+	diceCounts: [0, 0, 0, 0, 0, 0],
 	players: [],
 	status: NORMAL,
 	sequence: 1
 };
-
-var resultDices: [];
-var diceCounts: [0, 0, 0, 0, 0, 0];
 
 var categories = [
 	"aces", "deuces", "threes", "fours", "fives", "sixes",
@@ -104,15 +103,17 @@ function randomDices(parameter) {
 	var NOT_YOUR_TURN = 1;
 	var code = NOT_YOUR_TURN;
 	
-	if(isYourYurn(parameter)) {
+	if(isYourTurn(parameter)) {
 		code = SUCCESS;
+		gamedata.status = ROLL;
+		gamedata.diceCounts = [0, 0, 0, 0, 0, 0];
 		
 		for(var i = 0; i < TOTAL_DICES; i++) {
 			var random = randomNumber();
 			
 			gamedata.rollDices[i] = random;
 			gamedata.resultDices[i] = random;
-			//gamedata.diceCounts[random - 1]++;
+			gamedata.diceCounts[random - 1]++;
 		}
 		
 		gamedata.rollDices.sort();
@@ -165,7 +166,6 @@ var server = http.createServer(function(request, response) {
 			
 		case "/roll":
 			var parameter = getUrlParameters(request.url);
-			gamedata.status = ROLL;
 			
 			jsonResponse(response, randomDices(parameter));
 			return;
@@ -243,7 +243,7 @@ function getFilePath(urlPath) {
 	return urlPath.substr(1, urlPath.length - 1);
 }
 
-function isYourYurn(parameter) {
+function isYourTurn(parameter) {
 	return gamedata.players[gamedata.turn].id == parameter.id;
 }
 

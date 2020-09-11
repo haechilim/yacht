@@ -22,6 +22,9 @@ var SCORE_LINE_HEIGHT_RATIO = 21;//19.2;
 var CUP_ANIMATION_TIME = 2000;
 var CUP_SHAKING_INTERVAL = 100;
 
+var NORMAL = 0;
+var ROLL = 1;
+
 var center = {};
 var floorPosition = {};
 var kDicePositions = [];
@@ -94,6 +97,7 @@ function resize() {
 
 function redrawBoard() {
 	redrawFloatDices(false);
+	if(data.status == ROLL) rollWithAnimation();
 	redrawKeepDices();
 	redrawChance();
 }

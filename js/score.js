@@ -235,6 +235,81 @@ function markScores() {
 	}
 }
 
+function getDiceDotCount(number) {
+	var index = number - 1;
+	if(index < 0 || index >= data.diceCounts.length) return 0;
+	return data.diceCounts[index] * number;
+}
+
+function getChoiceScore() {
+	var sum = 0;
+	
+	for(var i = 0; i < data.resultDices.length; i++) {
+		sum += data.resultDices[i];
+	}
+	
+	return sum;
+}
+
+function get4OfKindScore() {
+	for(var i = 0; i < data.diceCounts.length; i++) {
+		if(data.diceCounts[i] == 4) return getChoiceScore();
+	}
+	
+	return 0;
+}
+
+function getFullHouseScore() {
+	var pair, triple;
+	
+	for(var i = 0; i < data.diceCounts.length; i++) {
+		if(data.diceCounts[i] == 2) pair = true;
+		else if(data.diceCounts[i] == 3) triple = true;
+	}
+	
+	return (pair && triple) ? getChoiceScore() : 0;
+}
+
+function getSSrtaightScore() {
+	return checkStraight(false) ? 15 : 0;
+}
+
+function getLSrtaightScore() {
+	return checkStraight(true) ? 30 : 0;
+}
+
+function getYachtScore() {
+	for(var i = 0; i < diceCounts.length; i++) {
+		if(diceCounts[i] == 5) return 50;
+	}
+	
+	return 0;
+}
+
+function checkStraight(large) {
+	var count = 0;
+	var number = large ? 5 : 4;
+	
+	for(var i = 0; i < data.diceCounts.length; i++) {
+		if(data.diceCounts[i] == 0) count = 0;
+		else {
+			count++;
+			if(count == number) return true;
+		}
+	}
+	
+	return false;
+}
+
+function calculateDiceCounts() {
+	diceCounts = [0, 0, 0, 0, 0, 0];
+	
+	for(var i = 0; i < data.resultDices.length; i++) {
+		var index = data.resultDices[i] - 1;
+		data.diceCounts[index]++;
+	}
+}
+
 function clearScores() {
 	for(var i = 0; i < categories.length; i++) {
 		var element = document.querySelector(".score tr." + categories[i] + " td:nth-child(" + (turn + 2) + ")");
