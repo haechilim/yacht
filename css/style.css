@@ -280,7 +280,6 @@ body {
 }
 
 .board .selectDiceContainer .dice {
-	display: none;
 	margin: 0px 10px;
 	cursor: pointer;
 	-webkit-transition-duration:0.5s;
@@ -302,6 +301,10 @@ body {
 
 .board .keepDiceContainer .dice {
 	cursor: pointer;
+}
+
+.board .dice {
+	display: none;
 }
 
 .drop-shadow {

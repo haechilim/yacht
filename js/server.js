@@ -16,6 +16,11 @@ var YACHT_INDEX = 11;
 var RC_SUCCESS = 0;
 var RC_NOT_YOUR_TURN = 1;
 
+// 참가요청에 대한 응답코드
+var JOIN_SUCCESS = 0;
+var JOIN_NO_ID = 1;
+var JOIN_ALREADY_EXISTS = 2;
+
 // 게임 상태(Game Status)
 var GS_NORMAL = 0;
 var GS_ROLL = 1;
@@ -31,7 +36,6 @@ var gamedata = {
 	keepDices: [0, 0, 0, 0, 0],
 	resultDices: [],
 	diceCounts: [0, 0, 0, 0, 0, 0],
-	guideScores: [],
 	players: [],
 	status: GS_NORMAL,
 	sequence: 1
@@ -46,10 +50,6 @@ var categories = [
 // ------------------- 전송 요청 처리 (주로직) --------------------------
 
 function join(parameters) {
-	var JOIN_SUCCESS = 0;
-	var JOIN_NO_ID = 1;
-	var JOIN_ALREADY_EXISTS = 2;
-	
 	var code = JOIN_SUCCESS;
 	var id = parameters.id;
 	var avatar = makeValidAvatar(parameters.avatar);
@@ -194,10 +194,14 @@ function score(parameter) {
 	function fixPlayerScore(categoryName) {
 		// 가이드 점수에 있는 값을 실제 플레이어 점수로 반영
 		var player = currentPlayer();
-		var index = getCategoryIndex(categoryName);
+		var categories = player.categories;
 		
-		player.categories[index].fixed = true;
-		player.categories[index].score = gamedata.guideScores[index];
+		for(var i = 0; i < categories.length; i++) {
+			var category = categories[i];
+			
+			if(category.name == categoryName) category.fixed = true;
+			else if(!category.fixed) category.score = 0;
+		}
 	}
 }
 
@@ -232,7 +236,8 @@ function calculateTotal() {
 }
 
 function calculateGuideScores() {
-	gamedata.guideScores = [
+	var player = currentPlayer();
+	var guideScores = [
 		getDiceDotCount(1), 
 		getDiceDotCount(2), 
 		getDiceDotCount(3), 
@@ -246,6 +251,12 @@ function calculateGuideScores() {
 		getLSrtaightScore(),
 		getYachtScore()
 	];
+	
+	for(var i = 0; i < player.categories.length; i++) {
+		var category = player.categories[i];
+		if(category.fixed) continue;
+		category.score = guideScores[i];
+	}
 }
 
 function getDiceDotCount(number) {

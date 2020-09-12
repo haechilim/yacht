@@ -1,11 +1,25 @@
 var SDICES_POPUP_DELAY = 1000;
 var SDICES_ANIMATION_DELAY = 1000;
 
+// 응답코드 (Response Code)
+var RC_SUCCESS = 0;
+var RC_NOT_YOUR_TURN = 1;
+
+// 참가요청에 대한 응답코드
+var JOIN_SUCCESS = 0;
+var JOIN_NO_ID = 1;
+var JOIN_ALREADY_EXISTS = 2;
+
+// 게임 상태(Game Status)
+var GS_NORMAL = 0;
+var GS_ROLL = 1;
+var GS_KEEP = 2;
+
+// 게임 데이터 요청 주기
+var GAME_DATA_REQUEST_INTERVAL = 1000;
+
 var soundTimer;
-var isGuideNumber = false; 
-var isSelectable = false; 
 var myId;
-var isMyTurn;
 var sequence = 0;
 
 var data;
@@ -16,49 +30,30 @@ var categories = [
 	"total"
 ];
 
-function init() {
+function init() {	
 	requestJoin(function(json) {
-		myId = json.id;
 		console.log(json);
-		
-		var timer = setInterval(function() {
-			requestGameData();
-		}, 1000);
+		if(json.code != JOIN_NO_ID) myId = json.id;
+		setInterval(requestGameData, GAME_DATA_REQUEST_INTERVAL);
 	});	
 }
 
 function requestGameData() {
 	requestData(function(json) {
+		if(sequence >= json.sequence) return;
 		data = json;
-		
-		if(sequence >= data.sequence) return;
-		
-		console.log(json);
-		
 		sequence = data.sequence;
-		isMyTurn = data.players[data.turn].id == myId;
 		
-		setCursor();
-		updateRollButtonVisibility();
-		updateSelectable(isSelectable);
-		isSelectable = false;
-		redrawTable();
-		redrawBoard();
-		showGuideNumber(isGuideNumber);
-		isGuideNumber = false;
-		showAllFloorDices(false);
+		console.log(data);
+		
+		redrawScoreTable();
+		redrawGameBoard();
 		determinePositions();
 		resize();
 	});
-	
-	function setCursor() {
-		document.querySelectorAll(".dice").forEach(function(element) {
-			element.style.cursor = isMyTurn ? "pointer" : "default";
-		});
-	}
 }
 
-// ---------------------------------------------
+// ---------------------- 서버 요청 -----------------------
 
 function requestJoin(callback) {
 	request("/join" + location.search, callback);
@@ -66,6 +61,18 @@ function requestJoin(callback) {
 
 function requestRoll(callback) {
 	request("/roll?id=" + myId, callback);
+}
+
+function requestKeep(index, callback) {
+	request("/keep?id=" + myId + "&index=" + index, callback);
+}
+
+function requestUnkeep(index, callback) {
+	request("/unkeep?id=" + myId + "&index=" + index, callback);
+}
+
+function requestScore(category, callback) {
+	request("/score?id=" + myId + "&category=" + category, callback);
 }
 
 function requestData(callback) {
@@ -84,13 +91,15 @@ function request(url, callback) {
 	xhr.send();
 }
 
-// ---------------------------------------------
+// -------------------- 주사위 굴리기 -------------------------
 
 function rollWithAnimation() {
 	if(leftChance <= 0) return;
 		
 	showAllFloatDices(false);
 	showRollButton(false);
+	redrawKeepDices();
+	clearGuideScores();
 	stopDingSound();
 
 	animateCup(function() {
@@ -101,11 +110,9 @@ function rollWithAnimation() {
 				animateFloatDices();
 				
 				setTimeout(function() {
-					updateSelectable(true);
-					redrawTable();
-					showGuideNumber(true);
+					redrawScoreTable();
 					updateRollButtonVisibility();
-					if(isMyTurn) startDingSound();
+					if(isMyTurn()) startDingSound();
 				}, SDICES_ANIMATION_DELAY);
 			}, SDICES_POPUP_DELAY);
 		});
@@ -131,8 +138,6 @@ function roll(oncomplete) {
 		showFloorDice(index, true);
 	}
 	
-	updateResultDices();
-	calculateDiceCounts();
 	playThrowSound();
 	
 	if(oncomplete) oncomplete();
@@ -171,19 +176,9 @@ function roll(oncomplete) {
 		
 		return false;
 	}
-	
-	function updateResultDices() {
-		data.resultDices = data.rollDices.concat([]);
-		
-		data.keepDices.forEach(function(number) {
-			if(number > 0) data.resultDices.push(number);
-		});
-		
-		data.resultDices.sort();
-	}
 }
 
-// ---------------------------------------------
+// -------------------- 주사위 킵/언킵 -------------------------
 
 function keepDice(number, index) {
 	if(index < 0 || index >= data.rollDices.length) return;
@@ -219,55 +214,14 @@ function unkeepDice(number, index) {
 	updateRollButtonVisibility();
 }
 
-//-------------------------------------------------
-
-function nextTurn() {
-	rollDices = [0, 0, 0, 0, 0];
-	keepDices = [0, 0, 0, 0, 0];
-	
-	updateSelectable(false);
-	stopDingSound();
-	
-	if(increaseTurn()) {
-		redrawGameTurn();
-	
-		resetChance();
-		showRollButton(true);
-		showAllFloatDices(false);
-		showAllKeepDices(false);
-	}
-	else {
-		// 최종 결과 출력
-		showRollButton(false);
-	}
-}
-
-function increaseTurn() {
-	turn++;
-	
-	if(turn >= data.players.length) {
-		gameTurn++;
-		if(gameTurn > MAX_GAME_TURN) return false;
-	}
-	
-	turn %= data.players.length;
-	
-	return true;
-}
-
 // ---------------------------------------------
 
-function resetChance() {
-	leftChance = 3;
-	redrawChance(leftChance);
-}
-	
-function decreaseChance() {
-	leftChance--;
-	redrawChance(leftChance);
+function isMyTurn() {
+	return data.players[data.turn].id == myId;
 }
 
-// ---------------------------------------------
+
+// -------------------- 소리 재생 -------------------------
 
 function playShakeSound() {
 	playSound("shake");
@@ -295,7 +249,7 @@ function playSound(filename) {
 	new Audio("sound/" + filename + ".m4a").play();
 }
 
-// ---------------------------------------------
+// -------------------- 이벤트 바인딩 -------------------------
 
 document.addEventListener("DOMContentLoaded", function() {
 	init();
@@ -304,6 +258,10 @@ document.addEventListener("DOMContentLoaded", function() {
 
 function bindEvents() {
 	document.querySelector("#roll").addEventListener('click', function() {
+		showAllFloatDices(false);
+		showRollButton(false);
+		stopDingSound();
+		
 		requestRoll(function(json) {
 			requestGameData();
 		});
@@ -311,37 +269,25 @@ function bindEvents() {
 	
 	document.querySelectorAll(".selectDiceContainer .dice").forEach(function(element) {
 		element.addEventListener('click', function() {
-			if(!isMyTurn) return;
+			if(!isMyTurn()) return;
 			
 			var index = parseInt(this.getAttribute("index"));
 			
-			requestKeepDice(function(json) {
+			requestKeep(index, function(json) {
 				requestGameData();
-				isGuideNumber = true;
-				isSelectable = true;
 			});
-			
-			function requestKeepDice(callback) {
-				request("/keep?id=" + myId + "&index=" + index, callback);
-			}
 		});
 	});
 	
 	document.querySelectorAll(".keepDiceContainer .dice").forEach(function(element) {
 		element.addEventListener('click', function() {
-			if(!isMyTurn) return;
+			if(!isMyTurn()) return;
 			
 			var index = parseInt(this.getAttribute("index"));
 			
-			requestUnkeepDice(function(json) {
+			requestUnkeep(index, function(json) {
 				requestGameData();
-				isGuideNumber = true;
-				isSelectable = true;
 			});
-			
-			function requestUnkeepDice(callback) {
-				request("/unkeep?id=" + myId + "&index=" + index, callback);
-			}
 		});
 	});	
 	

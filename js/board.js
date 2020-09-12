@@ -22,16 +22,185 @@ var SCORE_LINE_HEIGHT_RATIO = 21;//19.2;
 var CUP_ANIMATION_TIME = 2000;
 var CUP_SHAKING_INTERVAL = 100;
 
-var NORMAL = 0;
-var ROLL = 1;
-var KEEP = 2;
-
 var center = {};
 var floorPosition = {};
 var kDicePositions = [];
 var kDiceSize = {};
 var rDiceSize = {};
 var sDiceSize = {};
+
+
+// ---------------------------------------------
+
+function redrawGameBoard() {
+	showAllFloorDices(false);
+	showAllFloatDices(false);
+	
+	switch(data.status) {
+		case GS_ROLL:
+			redrawChance();
+			setCursor();
+			rollWithAnimation();
+			break;
+			
+		case GS_KEEP:
+			playKeepSound();
+		case GS_NORMAL:
+			redrawFloatDices(false);
+			redrawKeepDices();
+			redrawChance();
+			updateRollButtonVisibility();
+			setCursor();
+			break;
+	}
+}
+
+// ---------------------------------------------
+
+function animateFloatDices() {
+	setTimeout(function() {
+		document.querySelectorAll(".selectDiceContainer .dice").forEach(function(element) {
+		    element.classList.remove("initial");
+		});
+	}, 10);
+}
+
+function animateCup(oncomplete) {
+	var time = 0;
+	var cup = document.querySelector("#cupImage");
+
+	showCup(true);
+	playShakeSound();
+
+	var timer = setInterval(function() {
+		cup.classList.toggle("shake");
+		time += CUP_SHAKING_INTERVAL;
+		
+		if(time >= CUP_ANIMATION_TIME) {
+			clearInterval(timer);
+			if(oncomplete) oncomplete();
+		}
+	}, CUP_SHAKING_INTERVAL);
+}
+
+// ---------------------------------------------
+
+function validRollDiceCount() { // 모든 주사위가 킵 됐는지를 검사
+	var count = 0;
+	
+	for(var i = 0; i < data.rollDices.length; i++) {
+		if(data.rollDices[i] != 0) count++;
+	}
+	
+	return count;
+}
+
+// ---------------------------------------------
+
+function updateRollButtonVisibility() {
+	if(!isMyTurn()) showRollButton(false);
+	else if(data.leftChance == 3) showRollButton(true); 
+	else showRollButton(data.leftChance > 0 && validRollDiceCount() != 0); 
+}
+
+function setCursor() {
+	document.querySelectorAll(".dice").forEach(function(element) {
+		element.style.cursor = isMyTurn() ? "pointer" : "default";
+	});
+}
+
+// ---------------------------------------------
+
+function redrawFloatDices(readyForAnimimation) {
+	showAllFloatDices(false);
+	
+	for(var index = 0; index < data.rollDices.length; index++) {
+		if(data.rollDices[index] <= 0) continue;
+		
+		redrawFloatDice(index, data.rollDices[index], readyForAnimimation);
+		showFloatDice(index, true);
+	}
+}
+
+function redrawKeepDices() {
+	showAllKeepDices(false);
+	
+	for(var index = 0; index < data.keepDices.length; index++) {
+		if(data.keepDices[index] == 0) continue;
+		
+		redrawKeepDice(index, data.keepDices[index]);
+		showKeepDice(index, true);
+	}
+}
+
+function redrawFloorDice(index, number, position) {
+	var dice = document.querySelector(".rollDiceContainer .dice:nth-child(" + (index + 1) + ")");
+	dice.setAttribute( 'src', 'image/pdice' + number + '.png' );
+	dice.style.left = position.left + "px";
+	dice.style.top = position.top + "px";
+}
+
+function redrawFloatDice(index, number, readyForAnimimation) {
+	var dice = document.querySelector(".selectDiceContainer .dice:nth-child(" + (index + 1) + ")");
+	dice.setAttribute('src', 'image/dice' + number + '.png');
+	dice.setAttribute('number', number);
+	dice.setAttribute('index', index);
+
+	readyForAnimimation ? dice.classList.add("initial") : dice.classList.remove("initial");
+}
+
+function redrawKeepDice(index, number) {
+	var dice = document.querySelector(".keepDiceContainer .dice:nth-child(" + (index + 1) + ")");
+	dice.setAttribute('src', 'image/dice' + number + '.png');
+	dice.setAttribute('number', number);
+	dice.setAttribute('index', index);
+}
+
+function redrawChance() {
+	document.querySelector("#leftChance").innerText = data.leftChance;
+}
+
+// ---------------------------------------------
+
+function showAllKeepDices(visible) {
+	for(var i = 0; i < data.totalDices; i++) {
+		showKeepDice(i, visible);
+	}
+}
+
+function showAllFloorDices(visible) {
+	for(var i = 0; i < data.totalDices; i++) {
+		showFloorDice(i, visible);
+	}
+}
+
+function showAllFloatDices(visible) {
+	for(var i = 0; i < data.totalDices; i++) {
+		showFloatDice(i, visible);
+	}
+}
+
+function showKeepDice(index, visible) {
+	document.querySelector(".keepDiceContainer .dice:nth-child(" + (index + 1) + ")").style.display = visible ? "inline" : "none";
+}
+
+function showFloorDice(index, visible) {
+	document.querySelector(".rollDiceContainer .dice:nth-child(" + (index + 1) + ")").style.display = visible ? "inline" : "none";
+}
+
+function showFloatDice(index, visible) {
+	document.querySelector(".selectDiceContainer .dice:nth-child(" + (index + 1) + ")").style.display = visible ? "inline" : "none";
+}
+
+function showRollButton(visible) {
+	document.querySelector("#roll").style.display = visible ? "flex" : "none";
+}
+
+function showCup(visible) {
+	document.querySelector("#cup").style.display = visible ? "flex" : "none";
+}
+
+// ---------------------------------------------
 
 function determinePositions() {
 	var board = document.querySelector("#board");
@@ -92,158 +261,6 @@ function resize() {
 		dice.style.width = kDiceSize.width + "px";
 		dice.style.height = kDiceSize.height + "px";
 	}
-}
-
-// ---------------------------------------------
-
-function redrawBoard() {
-	redrawFloatDices(false);
-	
-	if(data.status == ROLL) rollWithAnimation();
-	else if(data.status == KEEP) {
-		playKeepSound();
-		isGuideNumber = true;
-	}
-	
-	redrawKeepDices();
-	redrawChance();
-}
-
-// ---------------------------------------------
-
-function animateFloatDices() {
-	setTimeout(function() {
-		document.querySelectorAll(".selectDiceContainer .dice").forEach(function(element) {
-		    element.classList.remove("initial");
-		});
-	}, 10);
-}
-
-function animateCup(oncomplete) {
-	var time = 0;
-	var cup = document.querySelector("#cupImage");
-
-	showCup(true);
-	playShakeSound();
-
-	var timer = setInterval(function() {
-		cup.classList.toggle("shake");
-		time += CUP_SHAKING_INTERVAL;
-		
-		if(time >= CUP_ANIMATION_TIME) {
-			clearInterval(timer);
-			if(oncomplete) oncomplete();
-		}
-	}, CUP_SHAKING_INTERVAL);
-}
-
-// ---------------------------------------------
-
-function updateRollButtonVisibility() {
-	if(!isMyTurn) showRollButton(false);
-	else if(data.leftChance == 3) showRollButton(true); 
-	else showRollButton(data.leftChance > 0 && validRollDiceCount() != 0); 
-}
-
-function validRollDiceCount() {
-	var count = 0;
-	
-	for(var i = 0; i < data.rollDices.length; i++) {
-		if(data.rollDices[i] != 0) count++;
-	}
-	
-	return count;
-}
-
-function redrawChance() {
-	document.querySelector("#leftChance").innerText = data.leftChance;
-}
-
-function redrawFloorDice(index, number, position) {
-	var dice = document.querySelector(".rollDiceContainer .dice:nth-child(" + (index + 1) + ")");
-	dice.setAttribute( 'src', 'image/pdice' + number + '.png' );
-	dice.style.left = position.left + "px";
-	dice.style.top = position.top + "px";
-}
-
-function redrawFloatDice(index, number, readyForAnimimation) {
-	var dice = document.querySelector(".selectDiceContainer .dice:nth-child(" + (index + 1) + ")");
-	dice.setAttribute('src', 'image/dice' + number + '.png');
-	dice.setAttribute('number', number);
-	dice.setAttribute('index', index);
-
-	readyForAnimimation ? dice.classList.add("initial") : dice.classList.remove("initial");
-}
-
-function redrawKeepDice(index, number) {
-	var dice = document.querySelector(".keepDiceContainer .dice:nth-child(" + (index + 1) + ")");
-	dice.setAttribute('src', 'image/dice' + number + '.png');
-	dice.setAttribute('number', number);
-	dice.setAttribute('index', index);
-}
-
-// ---------------------------------------------
-
-function redrawFloatDices(readyForAnimimation) {
-	showAllFloatDices(false);
-	
-	for(var index = 0; index < data.rollDices.length; index++) {
-		if(data.rollDices[index] <= 0) continue;
-		
-		redrawFloatDice(index, data.rollDices[index], readyForAnimimation);
-		showFloatDice(index, true);
-	}
-}
-
-function redrawKeepDices() {
-	showAllKeepDices(false);
-	
-	for(var index = 0; index < data.keepDices.length; index++) {
-		if(data.keepDices[index] == 0) continue;
-		
-		redrawKeepDice(index, data.keepDices[index]);
-		showKeepDice(index, true);
-	}
-}
-
-// ---------------------------------------------
-
-function showAllKeepDices(visible) {
-	for(var i = 0; i < data.totalDices; i++) {
-		showKeepDice(i, visible);
-	}
-}
-
-function showAllFloorDices(visible) {
-	for(var i = 0; i < data.totalDices; i++) {
-		showFloorDice(i, visible);
-	}
-}
-
-function showAllFloatDices(visible) {
-	for(var i = 0; i < data.totalDices; i++) {
-		showFloatDice(i, visible);
-	}
-}
-
-function showKeepDice(index, visible) {
-	document.querySelector(".keepDiceContainer .dice:nth-child(" + (index + 1) + ")").style.display = visible ? "inline" : "none";
-}
-
-function showFloorDice(index, visible) {
-	document.querySelector(".rollDiceContainer .dice:nth-child(" + (index + 1) + ")").style.display = visible ? "inline" : "none";
-}
-
-function showFloatDice(index, visible) {
-	document.querySelector(".selectDiceContainer .dice:nth-child(" + (index + 1) + ")").style.display = visible ? "inline" : "none";
-}
-
-function showRollButton(visible) {
-	document.querySelector("#roll").style.display = visible ? "flex" : "none";
-}
-
-function showCup(visible) {
-	document.querySelector("#cup").style.display = visible ? "flex" : "none";
 }
 
 // ---------------------------------------------
