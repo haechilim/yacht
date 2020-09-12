@@ -43,13 +43,16 @@ function headerHtml() {
 		var html = "";
 		
 		for(var index = 0; index < data.players.length; index++) {
+			var player = data.players[index];
 			var style = "player top-tborder bottom-border";
+
 			if(index == 0) style += " left-tborder";
 			if(index == data.players.length - 1) style += " right-tborder";
 			if(index > 0 && index < data.players.length) style += " left-border";
 			
 			html += '<th class="' + style + '">' +
-						'<img src="image/avatar/avatar' + data.players[index].avatar + '.png"/>' +
+						'<img src="image/avatar/avatar' + player.avatar + '.png"/><br/>' + 
+						decodeURIComponent(player.id)
 					'</th>';
 		}
 		

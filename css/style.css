@@ -31,6 +31,11 @@ body {
 	font-weight: normal;
 }
 
+.score th.player {
+	font-size: 12px;
+    line-height: 15px;
+}
+
 .score th.turn {
 	width: 300px;
 	padding: 0px;
