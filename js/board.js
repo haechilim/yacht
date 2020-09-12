@@ -188,7 +188,7 @@ function redrawFloatDices(readyForAnimimation) {
 	showAllFloatDices(false);
 	
 	for(var index = 0; index < data.rollDices.length; index++) {
-		if(data.rollDices[index] == 0) continue;
+		if(data.rollDices[index] <= 0) continue;
 		
 		redrawFloatDice(index, data.rollDices[index], readyForAnimimation);
 		showFloatDice(index, true);

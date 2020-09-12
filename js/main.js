@@ -22,7 +22,7 @@ function init() {
 		console.log(json);
 		
 		var timer = setInterval(function() {
-			requestGameData()
+			requestGameData();
 		}, 1000);
 	});	
 }
@@ -32,6 +32,8 @@ function requestGameData() {
 		data = json;
 		
 		if(sequence >= data.sequence) return;
+		
+		console.log(json);
 		
 		sequence = data.sequence;
 		isMyTurn = data.players[data.turn].id == myId;
@@ -117,7 +119,7 @@ function roll(oncomplete) {
 	showAllFloatDices(false);
 
 	for(var index = 0; index < data.rollDices.length; index++) {
-		if(data.rollDices[index] == 0) {
+		if(data.rollDices[index] <= 0) {
 			showFloorDice(index, false);
 			continue;
 		}
