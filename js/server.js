@@ -111,7 +111,7 @@ function abort(parameter) {
 		gamedata.status = GS_WAITING;
 		
 		gamedata.players.forEach(function(element) {
-			element.participation = true;
+			element.playing = true;
 			element.isBonus = false;
 			element.subtotal = 0;
 			element.total = 0;
@@ -388,7 +388,7 @@ function newPlayer(id, avatar) {
 	var result = {
 		id: id,
 		avatar: avatar,
-		participation: gamedata.status == GS_WAITING,
+		playing: gamedata.status == GS_WAITING,
 		owner: false,
 		isBonus: false,
 		subtotal: 0,
@@ -466,12 +466,12 @@ function isOwner(parameter) {
 }
 
 function increaseTurn() {
-	gamedata.turn++;
-	
-	if(gamedata.turn >= participatingPlayerLength()) {
-		gamedata.turn %= participatingPlayerLength();
-		gamedata.gameTurn++;
-		if(gamedata.gameTurn > 12) gamedata.gameTurn = 12;
+	for(var i = 0; i < gamedata.players.length; i++) {
+		nextTurn();
+		
+		var player = getPlayerByIndex(gamedata.turn);
+		
+		if(player && player.playing) break;
 	}
 	
 	gamedata.leftChance = 3;
@@ -479,16 +479,30 @@ function increaseTurn() {
 	gamedata.keepDices = [0, 0, 0, 0, 0];
 	gamedata.resultDices = [];
 	gamedata.diceCounts = [0, 0, 0, 0, 0, 0];
+	
+	function nextTurn() {
+		gamedata.turn++;
+	
+		if(gamedata.turn >= gamedata.players.length) {
+			gamedata.turn %= gamedata.players.length;
+			if(gamedata.gameTurn < 12) gamedata.gameTurn++;
+		}
+	}
 }
 
-function participatingPlayerLength() {
-	var length = 0
+// ------------------ 플레이어 관련 ---------------------------
+
+function getPlayerById(id) {
+	for(var i = 0; i < gamedata.players.length; i++) {
+		var player = gamedata.players[i];
+		if(player.id == id) return player;
+	}
 	
-	gamedata.players.forEach(function(element) {
-		if(element.participation) length++;
-	});
-	
-	return length;
+	return null;
+}
+
+function getPlayerByIndex(index) {
+	return (index >= 0 && index < gamedata.players.length) ? gamedata.players[index] : null;
 }
 
 // ------------------ 카테고리 관련 ---------------------------
