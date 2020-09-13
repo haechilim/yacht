@@ -90,7 +90,15 @@ function abort(parameter) {
 	
 	if(isOwner(parameter)) {
 		code = RC_SUCCESS;
-		
+		init();
+		gamedata.sequence++;
+	}
+	
+	return {
+		code: code
+	};
+	
+	function init() {
 		gamedata.totalDices = TOTAL_DICES;
 		gamedata.maxGameTurn = MAX_GAME_TURN;
 		gamedata.gameTurn = 1;
@@ -103,6 +111,7 @@ function abort(parameter) {
 		gamedata.status = GS_WAITING;
 		
 		gamedata.players.forEach(function(element) {
+			element.participation = true;
 			element.isBonus = false;
 			element.subtotal = 0;
 			element.total = 0;
@@ -114,13 +123,7 @@ function abort(parameter) {
 				categories[i].score = 0;
 			}
 		});
-		
-		gamedata.sequence++;
 	}
-	
-	return {
-		code: code
-	};
 }
 
 function roll(parameter) {
@@ -384,8 +387,9 @@ function checkStraight(large) {
 function newPlayer(id, avatar) {
 	var result = {
 		id: id,
-		owner: false,
 		avatar: avatar,
+		participation: gamedata.status == GS_WAITING,
+		owner: false,
 		isBonus: false,
 		subtotal: 0,
 		total: 0,
@@ -464,8 +468,8 @@ function isOwner(parameter) {
 function increaseTurn() {
 	gamedata.turn++;
 	
-	if(gamedata.turn >= gamedata.players.length) {
-		gamedata.turn %= gamedata.players.length;
+	if(gamedata.turn >= participatingPlayerLength()) {
+		gamedata.turn %= participatingPlayerLength();
 		gamedata.gameTurn++;
 		if(gamedata.gameTurn > 12) gamedata.gameTurn = 12;
 	}
@@ -475,6 +479,16 @@ function increaseTurn() {
 	gamedata.keepDices = [0, 0, 0, 0, 0];
 	gamedata.resultDices = [];
 	gamedata.diceCounts = [0, 0, 0, 0, 0, 0];
+}
+
+function participatingPlayerLength() {
+	var length = 0
+	
+	gamedata.players.forEach(function(element) {
+		if(element.participation) length++;
+	});
+	
+	return length;
 }
 
 // ------------------ 카테고리 관련 ---------------------------
