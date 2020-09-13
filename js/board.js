@@ -267,6 +267,7 @@ function determinePositions() {
 
 function resize() {
 	var board = document.querySelector("#board");
+	var blocker = document.querySelector("#blocker");
 	var cup = document.querySelector("#cupImage");
 	var score = document.querySelector("#score-container");
 	
@@ -291,6 +292,11 @@ function resize() {
 		dice.style.width = kDiceSize.width + "px";
 		dice.style.height = kDiceSize.height + "px";
 	}
+
+	document.querySelectorAll(".full-screen").forEach(function(element) {
+		element.style.width = window.innerWidth + "px";
+		element.style.height = window.innerHeight + "px";
+	})
 }
 
 // ---------------------------------------------

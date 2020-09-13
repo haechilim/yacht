@@ -1,0 +1,86 @@
+.blocker {
+	display: none;
+	opacity: 0.4;
+	background-color: #000;
+	z-index: 500;
+}
+
+.result {
+	display: none;
+    justify-content: space-around;
+    align-items: center;
+	z-index: 1000;
+}
+
+.result .player .top .name {
+	display: inline-block;
+	color: #ececec;
+	font-size: 50px;
+	font-weight: 900;
+	text-shadow: 1px 4px 3px #232323;
+	line-height: 55px;
+    margin: 0px 5px;
+    padding: 0px 20px;
+}
+
+.result .player .top .name.winner {
+	border-bottom: 3px solid #fbc128;
+}
+
+.result .player .top .trophy {
+	width: 50px;
+	height: 50px;
+	margin-bottom: -17px;
+}
+
+.result .player .middle {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	height: 250px;
+    margin-top: 10px;
+}
+
+.result .player .middle.winner {
+	background-image: url("../image/result/congrats.png");
+	background-size: 250px;
+	background-position: center;
+    background-repeat: no-repeat;
+}
+
+.result .player .middle .avatar {
+	width: 96px;
+	height: 96px;
+	border: 2px solid #fff;
+    border-radius: 50px;
+    overflow: hidden;
+}
+
+.result .player .middle .avatar img {
+	width: 96px;
+	height: 96px;
+}
+
+.result .player .bottom {
+	display: flex;
+	justify-content: center;
+}
+
+.result .player .bottom .score {
+	color: #ececec;
+	font-size: 40px;
+	font-weight: 900;
+	text-shadow: 1px 4px 3px #232323;
+    margin: 0px 0px;
+    padding: 0px 0px;
+    border: none;
+}
+
+.full-screen {
+	position: fixed;
+}
+
+.blur {
+	filter: blur(5px);
+	-webkit-filter: blur(5px);
+}

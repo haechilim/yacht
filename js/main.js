@@ -252,6 +252,10 @@ function playKeepSound() {
 	playSound("keep");
 }
 
+function playApplauseSound() {
+	playSound("applause", ".mp3");
+}
+
 function startDingSound() {
 	soundTimer = setInterval(function() {
 		playSound("ding");
@@ -262,8 +266,9 @@ function stopDingSound() {
 	if(soundTimer) clearInterval(soundTimer);
 }
 
-function playSound(filename) {
-	new Audio("sound/" + filename + ".m4a").play();
+function playSound(filename, extension) {
+	if(!extension) extension = ".m4a";
+	new Audio("sound/" + filename + extension).play();
 }
 
 // -------------------- 이벤트 바인딩 -------------------------

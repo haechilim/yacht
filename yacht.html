@@ -8,14 +8,19 @@
   <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100;200;300;400;500;600;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/result.css">
 
   <script type="text/javascript" src="js/board.js"></script>
   <script type="text/javascript" src="js/score.js"></script>
+  <script type="text/javascript" src="js/result.js"></script>
   <script type="text/javascript" src="js/main.js"></script>
 </head>
 
 <body>
-	<div class="container">
+	<div id="blocker" class="blocker full-screen"></div>
+	<div id="result" class="result full-screen drop-shadow"></div>
+
+	<div id="container" class="container">
 		<div class="score-container" id="score-container"></div>
 		
 		<div class="board" id="board">
