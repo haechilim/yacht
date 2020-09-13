@@ -25,6 +25,7 @@ var JOIN_ALREADY_EXISTS = 2;
 var GS_NORMAL = 0;
 var GS_ROLL = 1;
 var GS_KEEP = 2;
+var GS_WAITING = 3;
 
 var gamedata = {
 	totalDices: TOTAL_DICES,
@@ -37,7 +38,7 @@ var gamedata = {
 	resultDices: [],
 	diceCounts: [0, 0, 0, 0, 0, 0],
 	players: [],
-	status: GS_NORMAL,
+	status: GS_WAITING,
 	sequence: 1
 };
 
@@ -59,6 +60,7 @@ function join(parameters) {
 		if(playerExists(id)) code = JOIN_ALREADY_EXISTS;
 		else {
 			gamedata.players.push(newPlayer(id, avatar));
+			setOwner();
 			gamedata.sequence++;
 		}
 	}
@@ -66,6 +68,58 @@ function join(parameters) {
 	return {
 		code: code,
 		id: id
+	};
+}
+
+function start(parameter) {
+	var code = RC_NOT_YOUR_TURN;
+	
+	if(isOwner(parameter)) {
+		code = RC_SUCCESS;
+		gamedata.status = GS_NORMAL;
+		gamedata.sequence++;
+	}
+	
+	return {
+		code: code
+	};
+}
+
+function abort(parameter) {
+	var code = RC_NOT_YOUR_TURN;
+	
+	if(isOwner(parameter)) {
+		code = RC_SUCCESS;
+		
+		gamedata.totalDices = TOTAL_DICES;
+		gamedata.maxGameTurn = MAX_GAME_TURN;
+		gamedata.gameTurn = 1;
+		gamedata.turn = 0;
+		gamedata.leftChance = 3;
+		gamedata.rollDices = [-1, -1, -1, -1, -1];
+		gamedata.keepDices = [0, 0, 0, 0, 0];
+		gamedata.resultDices = [];
+		gamedata.diceCounts = [0, 0, 0, 0, 0, 0];
+		gamedata.status = GS_WAITING;
+		
+		gamedata.players.forEach(function(element) {
+			element.isBonus = false;
+			element.subtotal = 0;
+			element.total = 0;
+			
+			var categories = element.categories;
+			
+			for(var i = 0; i < categories.length; i++) {
+				categories[i].fixed = false;
+				categories[i].score = 0;
+			}
+		});
+		
+		gamedata.sequence++;
+	}
+	
+	return {
+		code: code
 	};
 }
 
@@ -86,7 +140,7 @@ function roll(parameter) {
 	
 	return {
 		code: code
-	}
+	};
 	
 	function reroll() {
 		// 남아 있는 주사위만 다시 굴림
@@ -136,7 +190,7 @@ function keep(parameter) {
 	
 	return {
 		code: code
-	}
+	};
 	
 	function addToEmptySlot(index) {
 		// 킵 주사위 영역 앞에서부터 빈 칸에 넣기
@@ -163,7 +217,7 @@ function unkeep(parameter) {
 	
 	return {
 		code: code
-	}
+	};
 	
 	function moveToRollDices(index) {
 		// 떠있는 주사위쪽으로 다시 옮기기
@@ -189,7 +243,7 @@ function score(parameter) {
 	
 	return {
 		code: code
-	}
+	};
 	
 	function fixPlayerScore(categoryName) {
 		// 가이드 점수에 있는 값을 실제 플레이어 점수로 반영
@@ -330,6 +384,7 @@ function checkStraight(large) {
 function newPlayer(id, avatar) {
 	var result = {
 		id: id,
+		owner: false,
 		avatar: avatar,
 		isBonus: false,
 		subtotal: 0,
@@ -346,6 +401,10 @@ function newPlayer(id, avatar) {
 	}
 	
 	return result;
+}
+
+function setOwner() {
+	gamedata.players[0].owner = true;
 }
 
 function currentPlayer() {
@@ -394,12 +453,21 @@ function isYourTurn(parameter) {
 	return gamedata.players[gamedata.turn].id == parameter.id;
 }
 
+function isOwner(parameter) {
+	for(var i = 0; i < gamedata.players.length; i++) {
+		var player = gamedata.players[i];
+		
+		if(player.id == parameter.id) return player.owner;
+	}
+}
+
 function increaseTurn() {
 	gamedata.turn++;
 	
 	if(gamedata.turn >= gamedata.players.length) {
 		gamedata.turn %= gamedata.players.length;
 		gamedata.gameTurn++;
+		if(gamedata.gameTurn > 12) gamedata.gameTurn = 12;
 	}
 	
 	gamedata.leftChance = 3;
@@ -436,6 +504,14 @@ var server = http.createServer(function(request, response) {
 			
 		case "/join":
 			jsonResponse(response, join(parameter));
+			return;
+			
+		case "/start":
+			jsonResponse(response, start(parameter));
+			return;
+			
+		case "/abort":
+			jsonResponse(response, abort(parameter));
 			return;
 			
 		case "/roll":

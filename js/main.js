@@ -14,6 +14,7 @@ var JOIN_ALREADY_EXISTS = 2;
 var GS_NORMAL = 0;
 var GS_ROLL = 1;
 var GS_KEEP = 2;
+var GS_WAITING = 3;
 
 // 게임 데이터 요청 주기
 var GAME_DATA_REQUEST_INTERVAL = 1000;
@@ -57,6 +58,15 @@ function requestGameData() {
 
 function requestJoin(callback) {
 	request("/join" + location.search, callback);
+}
+
+function requestStart(callback) {
+	request("/start?id=" + myId, callback);
+}
+
+
+function requestAbort(callback) {
+	request("/abort?id=" + myId, callback);
 }
 
 function requestRoll(callback) {
@@ -220,6 +230,13 @@ function isMyTurn() {
 	return data.players[data.turn].id == myId;
 }
 
+function isOwner() {
+	for(var i = 0; i < data.players.length; i++) {
+		var player = data.players[i];
+		
+		if(player.id == myId) return player.owner;
+	}
+}
 
 // -------------------- 소리 재생 -------------------------
 
@@ -257,6 +274,21 @@ document.addEventListener("DOMContentLoaded", function() {
 });
 
 function bindEvents() {
+	var button = document.querySelector(".bottom-controls button")
+	
+	button.addEventListener('click', function() {
+		if(button.innerText == "게임 시작") {
+			requestStart(function(json) {
+				requestGameData();
+			});
+		}
+		else if(button.innerText == "게임 종료") {
+			requestAbort(function(json) {
+				requestGameData();
+			});
+		}
+	});
+	
 	document.querySelector("#roll").addEventListener('click', function() {
 		showAllFloatDices(false);
 		showRollButton(false);

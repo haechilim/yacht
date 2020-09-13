@@ -36,6 +36,9 @@ function redrawGameBoard() {
 	showAllFloorDices(false);
 	showAllFloatDices(false);
 	
+	console.log(isOwner());
+	if(!isOwner()) showController(false);
+	
 	switch(data.status) {
 		case GS_ROLL:
 			redrawChance();
@@ -46,11 +49,20 @@ function redrawGameBoard() {
 		case GS_KEEP:
 			playKeepSound();
 		case GS_NORMAL:
+			changeToAbortButton();
 			redrawFloatDices(false);
+			showChance(true);
 			redrawKeepDices();
 			redrawChance();
 			updateRollButtonVisibility();
 			setCursor();
+			break;
+			
+		case GS_WAITING:
+			showAllKeepDices(false);
+			showRollButton(false);
+			showChance(false);
+			changeToStartButton();
 			break;
 	}
 }
@@ -162,6 +174,14 @@ function redrawChance() {
 
 // ---------------------------------------------
 
+function showController(visible) {
+	document.querySelector(".bottom-controls button").style.display = visible ? "inline" : "none";
+}
+
+function showChance(visible) {
+	document.querySelector(".left-chance").style.display = visible ? "inline" : "none";
+}
+
 function showAllKeepDices(visible) {
 	for(var i = 0; i < data.totalDices; i++) {
 		showKeepDice(i, visible);
@@ -198,6 +218,16 @@ function showRollButton(visible) {
 
 function showCup(visible) {
 	document.querySelector("#cup").style.display = visible ? "flex" : "none";
+}
+
+// ---------------------------------------------
+
+function changeToAbortButton() {
+	document.querySelector(".bottom-controls button").innerText = "게임 종료";
+}
+
+function changeToStartButton() {
+	document.querySelector(".bottom-controls button").innerText = "게임 시작";
 }
 
 // ---------------------------------------------

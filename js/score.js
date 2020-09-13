@@ -86,7 +86,7 @@ function scoreHtml(startIndex, endIndex) {
 	
 	function playersHtml(cindex) {
 		var html = "";
-		var normal = data.status == GS_NORMAL;
+		var normal = data.status == GS_NORMAL || data.status == GS_WAITING;
 			
 		for(var pindex = 0; pindex < data.players.length; pindex++) {
 			var player = data.players[pindex];
