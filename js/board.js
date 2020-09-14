@@ -184,7 +184,8 @@ function showController(visible) {
 }
 
 function showStartButton(visible) {
-	document.querySelector("#start").style.display = visible ? "inline" : "none";
+	//document.querySelector("#start").style.display = visible ? "inline" : "none";
+	showWaitingPopup(visible);
 }
 
 function showAbortButton(visible) {

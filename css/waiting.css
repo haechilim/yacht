@@ -1,0 +1,31 @@
+#waiting {
+	display: none;
+}
+
+#waiting .popup {
+	width: 600px;
+	height: 340px;
+}
+
+#waiting .desc {
+	display: flex;
+	justify-content: center;
+	margin-top: 20px;
+	margin-bottom: 10px;
+	font-size: 15px;
+	font-weight: 100;
+}
+
+#waiting .desc .bold {
+	font-weight: 400;
+}
+
+#waiting .desc.others {
+	display: none;
+}
+
+#waiting .player .name {
+	font-size: 17px;
+	text-align: center;
+    margin-top: -5px;
+}

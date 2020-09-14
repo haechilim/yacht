@@ -312,9 +312,7 @@ body {
 	display: none;
 }
 
-.full-screen {
-	position: fixed;
-}
+/* 기타 */
 
 .blur {
 	filter: blur(5px);

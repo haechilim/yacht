@@ -7,18 +7,58 @@
 
   <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100;200;300;400;500;600;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Nanum+Pen+Script&family=Righteous&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/popup.css">
   <link rel="stylesheet" href="css/result.css">
+  <link rel="stylesheet" href="css/waiting.css">
 
   <script type="text/javascript" src="js/board.js"></script>
   <script type="text/javascript" src="js/score.js"></script>
   <script type="text/javascript" src="js/result.js"></script>
+  <script type="text/javascript" src="js/waiting.js"></script>
   <script type="text/javascript" src="js/main.js"></script>
 </head>
 
 <body>
 	<div id="blocker" class="blocker full-screen"></div>
 	<div id="result" class="result full-screen drop-shadow"></div>
+	<div id="waiting" class="popup-container full-screen drop-shadow">
+		<div class="popup drop-shadow">
+			<div class="title">
+				<span class="owner">Haechi</span> <span class="yacht">Yacht</span>
+			</div>
+			<div class="desc owner">
+				준비가 되었으면&nbsp;<span class="bold">Enter</span>&nbsp;버튼을 눌러주세요.
+			</div>
+			<div class="desc others">
+				<span class="bold owner">김아빠</span>님이 게임을 시작할때까지 잠시만 기다려주세요...
+			</div>
+			<div class="avatars">
+				<div class="player">
+					<div class="avatar">
+						<img src="image/avatar/avatar3.png"/>
+					</div>
+					<div class="name">김아빠</div>
+				</div>
+				<div class="player">
+					<div avatar="9" class="avatar">
+						<img src="image/avatar/avatar9.png"/>
+					</div>
+					<div class="name">해치</div>
+				</div>
+				<div class="player">
+					<div avatar="10" class="avatar">
+						<img src="image/avatar/avatar10.png"/>
+					</div>
+					<div class="name">틀딱</div>
+				</div>
+			</div>
+			<div id="start" class="button drop-shadow">
+				<img src="image/join/enter.png"/>
+			</div>
+		</div>
+	</div>
 
 	<div id="container" class="container">
 		<div class="score-container" id="score-container"></div>
@@ -59,7 +99,6 @@
 			</div>
 			
 			<div class="bottom-controls">
-				<button id="start">게임 시작</button>
 				<button id="abort">게임 중단</button>
 			</div>
 			

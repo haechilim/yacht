@@ -1,41 +1,15 @@
-.join {
-	display: flex;
-	justify-content: center;
-	align-items: center;
-}
-
-.join .popup {
+#join-container .popup {
 	height: 560px;
-	background-color: #55d1be;
-	border: 3px solid #e7e4e9;
-	padding: 20px 10px;
 }
 
-.join .popup .title {
-	text-align: center;
-}
-
-.join .popup .title .owner {
-	color: #585858;
-	font-size: 25px;
-	font-family: 'Nanum Pen Script', cursive;
-}
-
-.join .popup .title .yacht {
-	color: #fff;
-	font-size: 35px;
-	font-family: 'Righteous', cursive;
-}
-
-.join .popup .name {
+#join-container .popup .name {
 	display: flex;
 	justify-content: center;
-	border-top: 2px solid #65a09a;
-	margin: 10px;
+	margin-bottom: 10px;
 	padding-top: 20px;
 }
 
-.join .popup .name input {
+#join-container .popup .name input {
 	width: 150px;
 	text-align: center;
 	font-size: 25px;
@@ -47,51 +21,21 @@
     padding: 5px 0px;
 }
 
-.join .popup .name input:focus {
+#join-container .popup .name input:focus {
     outline: none;
     border-style: dashed;
 }
 
-.join .popup .avatars {
+#join-container .popup .avatars {
 	width: 510px;
-	display: flex;
-	justify-content: space-around;
-	align-content: space-around;
-	align-items: center;
-	flex-wrap: wrap;
-	border-bottom: 2px solid #65a09a;
-	padding-bottom: 10px;
 }
 
-.join .popup .avatars .avatar.selected {
-	border: 2px dashed #fff;
-}
-
-.join .popup .avatars .avatar {
-	width: 76px;
-	height: 76px;
-	border: 2px solid #fff;
-    border-radius: 50px;
-    overflow: hidden;
-    margin: 10px 10px;
+#join-container .popup .avatars .avatar {
     cursor: pointer;
 }
 
-.join .popup .avatars .avatar img {
-	width: 76px;
-	height: 76px;
-}
-
-.join .popup .button {
-	display: flex;
-	justify-content: center;
-	margin: -15px 0px;
-}
-
-.join .popup .button img {
-	width: 170px;
-	height: 170px;
-	cursor: pointer;
+.popup .avatars .avatar.selected {
+	border: 2px dashed #fff;
 }
 
 .back {
