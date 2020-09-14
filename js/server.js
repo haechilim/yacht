@@ -7,7 +7,8 @@ var TOTAL_DICES = 5;
 var TOTAL_AVATAR = 13;
 
 //점검 주기
-var INSPECTION_INTERVAL = 10;
+var INSPECTION_INTERVAL = 5000;
+var RESULT_TIMER = 5000;
 
 // 카테고리 인덱스
 var ACES_INDEX = 0;
@@ -30,6 +31,7 @@ var GS_NORMAL = 0;
 var GS_ROLL = 1;
 var GS_KEEP = 2;
 var GS_WAITING = 3;
+var GS_RESULT = 4;
 
 var gamedata = {
 	totalDices: TOTAL_DICES,
@@ -51,6 +53,34 @@ var categories = [
 	"choice", "kind", "full-house", "s-straight", "l-straight", "yacht",
 ];
 
+// ------------------- 데이터 init --------------------------
+
+function init() {
+	gamedata.totalDices = TOTAL_DICES;
+	gamedata.maxGameTurn = MAX_GAME_TURN;
+	gamedata.gameTurn = 1;
+	gamedata.turn = 0;
+	gamedata.leftChance = 3;
+	gamedata.rollDices = [-1, -1, -1, -1, -1];
+	gamedata.keepDices = [0, 0, 0, 0, 0];
+	gamedata.resultDices = [];
+	gamedata.diceCounts = [0, 0, 0, 0, 0, 0];
+	gamedata.status = GS_WAITING;
+	
+	gamedata.players.forEach(function(element) {
+		element.playing = true;
+		element.isBonus = false;
+		element.subtotal = 0;
+		element.total = 0;
+		
+		var categories = element.categories;
+		
+		for(var i = 0; i < categories.length; i++) {
+			categories[i].fixed = false;
+			categories[i].score = 0;
+		}
+	});
+}
 
 // ------------------- 전송 요청 처리 (주로직) --------------------------
 
@@ -101,33 +131,6 @@ function abort(parameter) {
 	return {
 		code: code
 	};
-	
-	function init() {
-		gamedata.totalDices = TOTAL_DICES;
-		gamedata.maxGameTurn = MAX_GAME_TURN;
-		gamedata.gameTurn = 1;
-		gamedata.turn = 0;
-		gamedata.leftChance = 3;
-		gamedata.rollDices = [-1, -1, -1, -1, -1];
-		gamedata.keepDices = [0, 0, 0, 0, 0];
-		gamedata.resultDices = [];
-		gamedata.diceCounts = [0, 0, 0, 0, 0, 0];
-		gamedata.status = GS_WAITING;
-		
-		gamedata.players.forEach(function(element) {
-			element.playing = true;
-			element.isBonus = false;
-			element.subtotal = 0;
-			element.total = 0;
-			
-			var categories = element.categories;
-			
-			for(var i = 0; i < categories.length; i++) {
-				categories[i].fixed = false;
-				categories[i].score = 0;
-			}
-		});
-	}
 }
 
 function roll(parameter) {
@@ -397,7 +400,8 @@ function newPlayer(id, avatar) {
 		isBonus: false,
 		subtotal: 0,
 		total: 0,
-		categories: []
+		categories: [],
+		lastResponse: new Date()
 	};
 	
 	for(var i = 0; i < categories.length; i++) {
@@ -486,6 +490,14 @@ function increaseTurn() {
 		if(gamedata.turn >= gamedata.players.length) {
 			gamedata.turn %= gamedata.players.length;
 			if(gamedata.gameTurn < 12) gamedata.gameTurn++;
+			else {
+				gamedata.status = GS_RESULT;
+				
+				setTimeout(function() {
+					init();
+					gamedata.sequence++;
+				}, RESULT_TIMER);
+			}
 		}
 	}
 }
@@ -515,6 +527,11 @@ function getCategoryIndex(name) {
 	return -1;
 }	
 
+function updateLastResponse(id) {
+	if(getPlayerById(id) == null) return;
+	getPlayerById(id).lastResponse = new Date();
+}
+
 // ------------------- 전송 요청 처리 --------------------------
 
 var server = http.createServer(function(request, response) {
@@ -527,6 +544,7 @@ var server = http.createServer(function(request, response) {
 	
 	switch(urlPath) {
 		case "/data":
+			updateLastResponse(parameter.id);
 			jsonResponse(response, gamedata);
 			return;
 			
@@ -577,6 +595,19 @@ var server = http.createServer(function(request, response) {
 			});
 				
 			response.end(data);
+		}
+	}
+});
+
+setInterval(function() {
+	for(var i = 0; i < gamedata.players.length; i++) {
+		var player = gamedata.players[i];
+		
+		if(new Date().getTime() - player.lastResponse.getTime() >= 10000) {
+			gamedata.players.splice(i, 1);
+			setOwner();
+			if(gamedata.turn > i) gamedata.turn--;
+			gamedata.sequence++;
 		}
 	}
 });

@@ -15,6 +15,7 @@ var GS_NORMAL = 0;
 var GS_ROLL = 1;
 var GS_KEEP = 2;
 var GS_WAITING = 3;
+var GS_RESULT = 4;
 
 // 게임 데이터 요청 주기
 var GAME_DATA_REQUEST_INTERVAL = 1000;
@@ -51,6 +52,8 @@ function requestGameData() {
 		redrawGameBoard();
 		determinePositions();
 		resize();
+		
+		console.log(data.players[0].lastResponse);
 	});
 }
 
@@ -86,7 +89,7 @@ function requestScore(category, callback) {
 }
 
 function requestData(callback) {
-	request("/data", callback);
+	request("/data?id=" + myId, callback);
 }
 
 function request(url, callback) {

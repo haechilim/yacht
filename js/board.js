@@ -33,6 +33,7 @@ var sDiceSize = {};
 // ---------------------------------------------
 
 function redrawGameBoard() {
+	showController(true);
 	showAllFloorDices(false);
 	showAllFloatDices(false);
 	
@@ -59,11 +60,15 @@ function redrawGameBoard() {
 			break;
 			
 		case GS_WAITING:
+			showResult(false);
 			showAllKeepDices(false);
 			showRollButton(false);
 			showChance(false);
 			changeToStartButton();
 			break;
+			
+		case GS_RESULT:
+			showResult(true);
 	}
 }
 
