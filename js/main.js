@@ -230,12 +230,17 @@ function isMyTurn() {
 	return data.players[data.turn].id == myId;
 }
 
-function isOwner() {
+function AmIOwner() {
+	return getPlayerById(myId).owner;
+}
+
+function getPlayerById(id) {
 	for(var i = 0; i < data.players.length; i++) {
 		var player = data.players[i];
-		
-		if(player.id == myId) return player.owner;
+		if(player.id == id) return player;
 	}
+	
+	return null;
 }
 
 // -------------------- 소리 재생 -------------------------
@@ -279,19 +284,16 @@ document.addEventListener("DOMContentLoaded", function() {
 });
 
 function bindEvents() {
-	var button = document.querySelector(".bottom-controls button")
+	document.querySelector(".bottom-controls #start").addEventListener('click', function() {
+		requestStart(function(json) {
+			requestGameData();
+		});
+	});
 	
-	button.addEventListener('click', function() {
-		if(button.innerText == "게임 시작") {
-			requestStart(function(json) {
-				requestGameData();
-			});
-		}
-		else if(button.innerText == "게임 종료") {
-			requestAbort(function(json) {
-				requestGameData();
-			});
-		}
+	document.querySelector(".bottom-controls #abort").addEventListener('click', function() {
+		requestAbort(function(json) {
+			requestGameData();
+		});
 	});
 	
 	document.querySelector("#roll").addEventListener('click', function() {

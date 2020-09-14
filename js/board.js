@@ -36,14 +36,14 @@ function redrawGameBoard() {
 	showAllFloorDices(false);
 	showAllFloatDices(false);
 	
-	console.log(isOwner());
-	if(!isOwner()) showController(false);
+	if(!AmIOwner()) showController(false);
 	
 	switch(data.status) {
 		case GS_ROLL:
 			redrawChance();
 			setCursor();
 			rollWithAnimation();
+			changeToAbortButton();
 			break;
 			
 		case GS_KEEP:
@@ -175,7 +175,15 @@ function redrawChance() {
 // ---------------------------------------------
 
 function showController(visible) {
-	document.querySelector(".bottom-controls button").style.display = visible ? "inline" : "none";
+	document.querySelector(".bottom-controls").style.display = visible ? "inline" : "none";
+}
+
+function showStartButton(visible) {
+	document.querySelector(".bottom-controls #start").style.display = visible ? "inline" : "none";
+}
+
+function showAbortButton(visible) {
+	document.querySelector(".bottom-controls #abort").style.display = visible ? "inline" : "none";
 }
 
 function showChance(visible) {
@@ -223,11 +231,13 @@ function showCup(visible) {
 // ---------------------------------------------
 
 function changeToAbortButton() {
-	document.querySelector(".bottom-controls button").innerText = "게임 종료";
+	showStartButton(false);
+	showAbortButton(true);
 }
 
 function changeToStartButton() {
-	document.querySelector(".bottom-controls button").innerText = "게임 시작";
+	showStartButton(true);
+	showAbortButton(false);
 }
 
 // ---------------------------------------------

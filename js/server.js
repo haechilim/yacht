@@ -6,6 +6,9 @@ var MAX_GAME_TURN = 12;
 var TOTAL_DICES = 5;
 var TOTAL_AVATAR = 13;
 
+//점검 주기
+var INSPECTION_INTERVAL = 10;
+
 // 카테고리 인덱스
 var ACES_INDEX = 0;
 var SIXES_INDEX = 5;
@@ -15,6 +18,7 @@ var YACHT_INDEX = 11;
 // 응답코드 (Response Code)
 var RC_SUCCESS = 0;
 var RC_NOT_YOUR_TURN = 1;
+var RC_NO_PERMISSION = 2;
 
 // 참가요청에 대한 응답코드
 var JOIN_SUCCESS = 0;
@@ -72,9 +76,9 @@ function join(parameters) {
 }
 
 function start(parameter) {
-	var code = RC_NOT_YOUR_TURN;
+	var code = RC_NO_PERMISSION;
 	
-	if(isOwner(parameter)) {
+	if(isOwner(parameter.id)) {
 		code = RC_SUCCESS;
 		gamedata.status = GS_NORMAL;
 		gamedata.sequence++;
@@ -86,9 +90,9 @@ function start(parameter) {
 }
 
 function abort(parameter) {
-	var code = RC_NOT_YOUR_TURN;
+	var code = RC_NO_PERMISSION;
 	
-	if(isOwner(parameter)) {
+	if(isOwner(parameter.id)) {
 		code = RC_SUCCESS;
 		init();
 		gamedata.sequence++;
@@ -457,12 +461,8 @@ function isYourTurn(parameter) {
 	return gamedata.players[gamedata.turn].id == parameter.id;
 }
 
-function isOwner(parameter) {
-	for(var i = 0; i < gamedata.players.length; i++) {
-		var player = gamedata.players[i];
-		
-		if(player.id == parameter.id) return player.owner;
-	}
+function isOwner(id) {
+	return getPlayerById(id).owner;
 }
 
 function increaseTurn() {
