@@ -75,12 +75,3 @@
     padding: 0px 0px;
     border: none;
 }
-
-.full-screen {
-	position: fixed;
-}
-
-.blur {
-	filter: blur(5px);
-	-webkit-filter: blur(5px);
-}

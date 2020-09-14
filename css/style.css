@@ -312,6 +312,15 @@ body {
 	display: none;
 }
 
+.full-screen {
+	position: fixed;
+}
+
+.blur {
+	filter: blur(5px);
+	-webkit-filter: blur(5px);
+}
+
 .drop-shadow {
 	-webkit-filter: drop-shadow(5px 5px 10px rgba(0,0,0,.5));
 	-moz-filter: drop-shadow(5px 5px 10px rgba(0,0,0,.5));
