@@ -236,6 +236,8 @@ body {
     margin-right: 100px;
 }
 
+/* 롤 버튼 */
+
 .board .roll {
 	position: fixed;
     right: 50px;
@@ -254,6 +256,41 @@ body {
     left: 0px;
     color: #fcfbef;
 	font-size: 50px;
+	font-weight: 900;
+	text-shadow: 2px 2px 1px #333;
+}
+
+/* 게임 중지 버튼 */
+
+.board .abort {
+	position: fixed;
+    left: 37%;
+    bottom: 25px;
+    cursor: pointer;
+    opacity: 0.3;
+    -webkit-transition-property: opacity;
+	-webkit-transition-duration:0.5s;
+    -webkit-transition-timing-function: ease-in-out;
+	transition-property: opacity;
+  	transition-duration:0.5s;
+    transition-timing-function: ease-in-out;
+}
+
+.board .abort:hover {
+	opacity: 1.0;
+}
+
+.board .abort img {
+	width: 80px;
+	height: 80px;
+}
+
+.board .abort div {
+	position: absolute;
+	top: 63px;
+    left: 5px;
+    color: #fcfbef;
+	font-size: 19px;
 	font-weight: 900;
 	text-shadow: 2px 2px 1px #333;
 }

@@ -180,7 +180,7 @@ function redrawChance() {
 // ---------------------------------------------
 
 function showController(visible) {
-	document.querySelector(".bottom-controls").style.display = visible ? "inline" : "none";
+	document.querySelector("#abort").style.display = visible ? "block" : "none";
 }
 
 function showStartButton(visible) {
