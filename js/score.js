@@ -52,7 +52,7 @@ function headerHtml() {
 			
 			html += '<th class="' + style + '">' +
 						'<img src="image/avatar/avatar' + player.avatar + '.png"/><br/>' + 
-						decodeURIComponent(player.id)
+						decodeURIComponent(player.name)
 					'</th>';
 		}
 		

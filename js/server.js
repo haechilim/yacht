@@ -23,7 +23,7 @@ var RC_NO_PERMISSION = 2;
 
 // 참가요청에 대한 응답코드
 var JOIN_SUCCESS = 0;
-var JOIN_NO_ID = 1;
+var JOIN_NO_NAME = 1;
 var JOIN_ALREADY_EXISTS = 2;
 
 // 게임 상태(Game Status)
@@ -47,6 +47,8 @@ var gamedata = {
 	status: GS_WAITING,
 	sequence: 1
 };
+
+var lastId = 0;
 
 var categories = [
 	"aces", "deuces", "threes", "fours", "fives", "sixes",
@@ -86,17 +88,23 @@ function init() {
 
 function join(parameters) {
 	var code = JOIN_SUCCESS;
-	var id = parameters.id;
+	var id = -1;
+	var name = parameters.name;
 	var avatar = makeValidAvatar(parameters.avatar);
 	
-	if(!id) code = JOIN_NO_ID;
+	if(!name) code = JOIN_NO_NAME;
 	else {
-		if(playerExists(id)) code = JOIN_ALREADY_EXISTS;
+		var player = getPlayerByName(name);
+		
+		if(player) code = JOIN_ALREADY_EXISTS;
 		else {
-			gamedata.players.push(newPlayer(id, avatar));
+			player = newPlayer(name, avatar);
+			gamedata.players.push(player);
 			setOwner();
 			gamedata.sequence++;
 		}
+		
+		id = player.id;
 	}
 	
 	return {
@@ -391,9 +399,10 @@ function checkStraight(large) {
 	
 // ---------------------------------------------
 
-function newPlayer(id, avatar) {
+function newPlayer(name, avatar) {
 	var result = {
-		id: id,
+		id: lastId++,
+		name: name,
 		avatar: avatar,
 		playing: gamedata.status == GS_WAITING,
 		owner: false,
@@ -416,6 +425,8 @@ function newPlayer(id, avatar) {
 }
 
 function setOwner() {
+	if(gamedata.players.length <= 0) return;
+	
 	gamedata.players[0].owner = true;
 }
 
@@ -508,6 +519,15 @@ function getPlayerById(id) {
 	for(var i = 0; i < gamedata.players.length; i++) {
 		var player = gamedata.players[i];
 		if(player.id == id) return player;
+	}
+	
+	return null;
+}
+
+function getPlayerByName(name) {
+	for(var i = 0; i < gamedata.players.length; i++) {
+		var player = gamedata.players[i];
+		if(player.name == name) return player;
 	}
 	
 	return null;

@@ -7,7 +7,7 @@ var RC_NOT_YOUR_TURN = 1;
 
 // 참가요청에 대한 응답코드
 var JOIN_SUCCESS = 0;
-var JOIN_NO_ID = 1;
+var JOIN_NO_NAME = 1;
 var JOIN_ALREADY_EXISTS = 2;
 
 // 게임 상태(Game Status)
@@ -35,7 +35,8 @@ var categories = [
 function init() {	
 	requestJoin(function(json) {
 		console.log(json);
-		if(json.code != JOIN_NO_ID) myId = json.id;
+		myId = json.id;
+		if(json.code == JOIN_NO_NAME) return;
 		setInterval(requestGameData, GAME_DATA_REQUEST_INTERVAL);
 	});	
 }

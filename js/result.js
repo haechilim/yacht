@@ -39,7 +39,7 @@ function getResultHtml(maxScore) {
 		html += '<div class="player">';
 			html += '<div class="top">'
 				if(winner) html += '<img class="trophy" src="image/result/trophy.png"/>';
-				html += '<div class="name' + (winner ? ' winner' : '') + '">' + decodeURIComponent(player.id) + '</div>';
+				html += '<div class="name' + (winner ? ' winner' : '') + '">' + decodeURIComponent(player.name) + '</div>';
 				if(winner) html += '<img class="trophy" src="image/result/trophy.png"/>';
 			html += '</div>';
 
