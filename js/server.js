@@ -6,9 +6,9 @@ var MAX_GAME_TURN = 12;
 var TOTAL_DICES = 5;
 var TOTAL_AVATAR = 13;
 
-//점검 주기
-var INSPECTION_INTERVAL = 5000;
-var RESULT_TIMER = 5000;
+
+var SESSION_TIMEOUT = 10000; // 세션 유지시간 (ms)
+var RESULT_SHOWING_TIME = 5000; // 점수화면 노출시간
 
 // 카테고리 인덱스
 var ACES_INDEX = 0;
@@ -401,7 +401,7 @@ function newPlayer(id, avatar) {
 		subtotal: 0,
 		total: 0,
 		categories: [],
-		lastResponse: new Date()
+		time: new Date()
 	};
 	
 	for(var i = 0; i < categories.length; i++) {
@@ -496,7 +496,7 @@ function increaseTurn() {
 				setTimeout(function() {
 					init();
 					gamedata.sequence++;
-				}, RESULT_TIMER);
+				}, RESULT_SHOWING_TIME);
 			}
 		}
 	}
@@ -527,11 +527,6 @@ function getCategoryIndex(name) {
 	return -1;
 }	
 
-function updateLastResponse(id) {
-	if(getPlayerById(id) == null) return;
-	getPlayerById(id).lastResponse = new Date();
-}
-
 // ------------------- 전송 요청 처리 --------------------------
 
 var server = http.createServer(function(request, response) {
@@ -544,7 +539,7 @@ var server = http.createServer(function(request, response) {
 	
 	switch(urlPath) {
 		case "/data":
-			updateLastResponse(parameter.id);
+			updateSessionTime(parameter.id);
 			jsonResponse(response, gamedata);
 			return;
 			
@@ -599,21 +594,36 @@ var server = http.createServer(function(request, response) {
 	}
 });
 
-setInterval(function() {
-	for(var i = 0; i < gamedata.players.length; i++) {
-		var player = gamedata.players[i];
-		
-		if(new Date().getTime() - player.lastResponse.getTime() >= 10000) {
-			gamedata.players.splice(i, 1);
-			setOwner();
-			if(gamedata.turn > i) gamedata.turn--;
-			gamedata.sequence++;
-		}
-	}
-});
-
 server.listen(8888);
+checkSessionTimeout();
 console.log("서버 on");
+
+// ------------------- 세션 관련 --------------------------
+
+function checkSessionTimeout() {
+	setInterval(function() {
+		var now = new Date().getTime();
+		
+		for(var i = 0; i < gamedata.players.length; i++) {
+			var player = gamedata.players[i];
+			
+			if(now - player.time >= SESSION_TIMEOUT) {
+				if(gamedata.turn == i && i == gamedata.players.length - 1) gamedata.turn = 0;
+				else if(gamedata.turn > i) gamedata.turn--;
+				gamedata.players.splice(i, 1);
+				setOwner();
+				gamedata.sequence++;
+			}
+		}
+	}, SESSION_TIMEOUT);
+}
+
+function updateSessionTime(id) {
+	var player = getPlayerById(id);
+	if(player) player.time = new Date().getTime();
+}
+
+// ---------------------------------------------
 
 function jsonResponse(response, data) {
 	response.writeHead(200, {

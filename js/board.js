@@ -34,6 +34,7 @@ var sDiceSize = {};
 
 function redrawGameBoard() {
 	showController(true);
+	showResult(false);
 	showAllFloorDices(false);
 	showAllFloatDices(false);
 	
@@ -60,7 +61,6 @@ function redrawGameBoard() {
 			break;
 			
 		case GS_WAITING:
-			showResult(false);
 			showAllKeepDices(false);
 			showRollButton(false);
 			showChance(false);
@@ -184,11 +184,11 @@ function showController(visible) {
 }
 
 function showStartButton(visible) {
-	document.querySelector(".bottom-controls #start").style.display = visible ? "inline" : "none";
+	document.querySelector("#start").style.display = visible ? "inline" : "none";
 }
 
 function showAbortButton(visible) {
-	document.querySelector(".bottom-controls #abort").style.display = visible ? "inline" : "none";
+	document.querySelector("#abort").style.display = visible ? "inline" : "none";
 }
 
 function showChance(visible) {

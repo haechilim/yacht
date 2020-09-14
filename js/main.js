@@ -287,13 +287,13 @@ document.addEventListener("DOMContentLoaded", function() {
 });
 
 function bindEvents() {
-	document.querySelector(".bottom-controls #start").addEventListener('click', function() {
+	document.querySelector("#start").addEventListener('click', function() {
 		requestStart(function(json) {
 			requestGameData();
 		});
 	});
 	
-	document.querySelector(".bottom-controls #abort").addEventListener('click', function() {
+	document.querySelector("#abort").addEventListener('click', function() {
 		requestAbort(function(json) {
 			requestGameData();
 		});
