@@ -20,7 +20,7 @@ function bindEvents() {
 	document.querySelector("#join").addEventListener("click", function() {
 		var name = document.querySelector("#name").value;
 		var avatar = document.querySelector(".avatars .selected").getAttribute("avatar");
-		var url = "/?name=" + name + "&avatar=" + avatar;
+		var url = "/game?name=" + name + "&avatar=" + avatar;
 
 		if(name) location.href = url;
 	});

@@ -682,7 +682,8 @@ function getUrlParameters(url) {
 }
 
 function getFilePath(urlPath) {
-	if(urlPath == "/") return "yacht.html";
+	if(urlPath == "/") return "join.html";
+	else if(urlPath == "/game") return "yacht.html";
 	
 	return urlPath.substr(1, urlPath.length - 1);
 }
