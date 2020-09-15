@@ -349,7 +349,7 @@ function getChoiceScore() {
 
 function get4OfKindScore() {
 	for(var i = 0; i < gamedata.diceCounts.length; i++) {
-		if(gamedata.diceCounts[i] == 4) return getChoiceScore();
+		if(gamedata.diceCounts[i] >= 4) return getChoiceScore();
 	}
 	
 	return 0;
@@ -359,7 +359,8 @@ function getFullHouseScore() {
 	var pair, triple;
 	
 	for(var i = 0; i < gamedata.diceCounts.length; i++) {
-		if(gamedata.diceCounts[i] == 2) pair = true;
+		if(gamedata.diceCounts[i] == 5) return getChoiceScore();
+		else if(gamedata.diceCounts[i] == 2) pair = true;
 		else if(gamedata.diceCounts[i] == 3) triple = true;
 	}
 	

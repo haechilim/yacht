@@ -5,7 +5,7 @@ var YACHT_INDEX = 11;
 
 var categorieNames = [
 	"Aces", "Deuces", "Threes", "Fours", "Fives", "Sixes",
-	"Choice", "4 fo a kind", "Full House", "S. Straight", "L. Straight", "Yacht"
+	"Choice", "4 of a kind", "Full House", "S. Straight", "L. Straight", "Yacht"
 ];
 
 var categorieIcons = [
