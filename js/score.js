@@ -188,6 +188,8 @@ function getCategoryIcon(index) {
 function bindScoreEvents() {
 	document.querySelectorAll(".score .selectable").forEach(function(element) {
 		element.addEventListener('click', function() {
+			if(element.innerText == "") return;
+			
 			var category = this.parentElement.className;
 			
 			requestScore(category, function(json) {

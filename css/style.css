@@ -351,6 +351,10 @@ body {
 
 /* 기타 */
 
+#abort div {
+	font-size: 15px;
+}
+
 .blur {
 	filter: blur(5px);
 	-webkit-filter: blur(5px);
